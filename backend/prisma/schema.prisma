@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -10,4 +8,183 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  ATTENDEE
+  ORGANIZER
+  ADMIN
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  COMPLETED
+  CANCELLED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+// ---------------------------------------------------------------------------
+// Models
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String     @id @default(cuid())
+  username     String     @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  email        String     @unique
+  phone        String
+  address      String
+  city         String
+  country      String
+  latitude     Float?
+  longitude    Float?
+  taxId        String
+  role         Role       @default(ATTENDEE)
+  status       UserStatus @default(PENDING)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relations
+  refreshTokens  RefreshToken[]
+  organizedEvents Event[]        @relation("Organizer")
+  bookings        Booking[]
+  sentMessages    Message[]      @relation("SentMessages")
+  receivedMessages Message[]     @relation("ReceivedMessages")
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model Category {
+  id     String          @id @default(cuid())
+  name   String          @unique
+  events EventCategory[]
+
+  @@map("categories")
+}
+
+model Event {
+  id            String      @id @default(cuid())
+  title         String
+  eventType     String
+  venue         String
+  address       String
+  city          String
+  country       String
+  latitude      Float?
+  longitude     Float?
+  startDateTime DateTime
+  endDateTime   DateTime
+  capacity      Int
+  status        EventStatus @default(DRAFT)
+  description   String
+  organizerId   String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  organizer   User            @relation("Organizer", fields: [organizerId], references: [id])
+  categories  EventCategory[]
+  ticketTypes TicketType[]
+  bookings    Booking[]
+  photos      EventPhoto[]
+
+  @@map("events")
+}
+
+model EventCategory {
+  eventId    String
+  categoryId String
+
+  event    Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, categoryId])
+  @@map("event_categories")
+}
+
+model TicketType {
+  id        String  @id @default(cuid())
+  eventId   String
+  name      String
+  price     Decimal @db.Decimal(10, 2)
+  quantity  Int
+  available Int
+
+  event    Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@map("ticket_types")
+}
+
+model Booking {
+  id              String        @id @default(cuid())
+  eventId         String
+  userId          String
+  ticketTypeId    String
+  numberOfTickets Int
+  totalCost       Decimal       @db.Decimal(10, 2)
+  status          BookingStatus @default(CONFIRMED)
+  createdAt       DateTime      @default(now())
+
+  event      Event      @relation(fields: [eventId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+  ticketType TicketType @relation(fields: [ticketTypeId], references: [id])
+
+  @@map("bookings")
+}
+
+model Message {
+  id                 String   @id @default(cuid())
+  senderId           String
+  recipientId        String
+  subject            String
+  body               String
+  read               Boolean  @default(false)
+  deletedBySender    Boolean  @default(false)
+  deletedByRecipient Boolean  @default(false)
+  createdAt          DateTime @default(now())
+
+  sender    User @relation("SentMessages", fields: [senderId], references: [id])
+  recipient User @relation("ReceivedMessages", fields: [recipientId], references: [id])
+
+  @@map("messages")
+}
+
+model EventPhoto {
+  id       String @id @default(cuid())
+  eventId  String
+  filename String
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("event_photos")
 }

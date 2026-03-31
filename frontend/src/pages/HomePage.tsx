@@ -1,13 +1,86 @@
-import RecommendedEvents from '../components/recommendations/RecommendedEvents';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 export default function HomePage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+  };
+
+  const isAdmin    = user?.role === 'ADMIN';
+  const isOrganizer = user?.role === 'ORGANIZER' || isAdmin;
 
   return (
-    <div className="home-page">
-      <h1>Welcome back{user ? `, ${user.name}` : ''}!</h1>
-      <RecommendedEvents />
+    <div className="page-wrapper">
+      {/* Top bar */}
+      <header className="topbar">
+        <div className="topbar-brand">
+          <div className="topbar-brand-icon">E</div>
+          EventApp
+        </div>
+        <div className="topbar-actions">
+          <span className="topbar-user">
+            Hello, <strong>{user?.firstName ?? user?.username}</strong>
+          </span>
+          <button className="btn btn-secondary btn-sm" onClick={handleLogout}>
+            Sign Out
+          </button>
+        </div>
+      </header>
+
+      <main className="page-content">
+        <div className="page-header">
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-subtitle">
+            Welcome back, {user?.firstName ?? user?.username}!
+          </p>
+        </div>
+
+        <div className="dashboard-grid">
+          {/* Browse Events — visible to all */}
+          <Link to="/events" className="dash-card">
+            <div className="dash-card-icon" style={{ background: '#e0e7ff' }}>🎟️</div>
+            <div className="dash-card-title">Browse Events</div>
+            <div className="dash-card-desc">Discover upcoming events near you</div>
+          </Link>
+
+          {/* My Bookings — all approved users */}
+          <Link to="/bookings" className="dash-card">
+            <div className="dash-card-icon" style={{ background: '#f0fdf4' }}>📋</div>
+            <div className="dash-card-title">My Bookings</div>
+            <div className="dash-card-desc">View and manage your reservations</div>
+          </Link>
+
+          {/* Messages — all approved users */}
+          <Link to="/messaging" className="dash-card">
+            <div className="dash-card-icon" style={{ background: '#fef9c3' }}>💬</div>
+            <div className="dash-card-title">Messages</div>
+            <div className="dash-card-desc">Send and receive messages</div>
+          </Link>
+
+          {/* Organizer tools */}
+          {isOrganizer && (
+            <Link to="/manage-events" className="dash-card">
+              <div className="dash-card-icon" style={{ background: '#ede9fe' }}>📅</div>
+              <div className="dash-card-title">Manage Events</div>
+              <div className="dash-card-desc">Create and manage your events</div>
+            </Link>
+          )}
+
+          {/* Admin panel */}
+          {isAdmin && (
+            <Link to="/admin" className="dash-card">
+              <div className="dash-card-icon" style={{ background: '#fee2e2' }}>🛡️</div>
+              <div className="dash-card-title">Admin Panel</div>
+              <div className="dash-card-desc">Manage users and platform settings</div>
+            </Link>
+          )}
+        </div>
+      </main>
     </div>
   );
 }
+

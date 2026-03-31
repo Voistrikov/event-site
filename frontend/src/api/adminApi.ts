@@ -1,12 +1,23 @@
 import axiosInstance from './axiosInstance';
+import type { User, Role, UserStatus } from '../types/user.types';
 
-export const getPendingUsers = () => axiosInstance.get('/admin/users/pending');
+export interface ListUsersParams {
+  role?:   Role;
+  status?: UserStatus;
+  page?:   number;
+  limit?:  number;
+}
 
-export const approveUser = (id: string) => axiosInstance.post(`/admin/users/${id}/approve`);
+export interface ListUsersResponse {
+  data:       User[];
+  total:      number;
+  page:       number;
+  limit:      number;
+  totalPages: number;
+}
 
-export const rejectUser = (id: string) => axiosInstance.post(`/admin/users/${id}/reject`);
+export const listUsers = (params?: ListUsersParams) =>
+  axiosInstance.get<ListUsersResponse>('/admin/users', { params });
 
-export const exportUsersXml = () =>
-  axiosInstance.get('/admin/export/users.xml', { responseType: 'blob' });
-
-export const exportUsersJson = () => axiosInstance.get('/admin/export/users.json');
+export const updateUserStatus = (id: string, status: 'APPROVED' | 'REJECTED') =>
+  axiosInstance.patch<{ user: User }>(`/admin/users/${id}/status`, { status });
