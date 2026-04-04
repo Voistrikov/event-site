@@ -39,10 +39,10 @@ export default function RegisterPage() {
   return (
     <div className="auth-wrapper">
       <div className="auth-card auth-card-wide">
-        <div className="auth-logo">
+        <Link to="/" className="auth-logo" style={{ textDecoration: 'none' }}>
           <div className="auth-logo-icon">E</div>
           <span className="auth-logo-text">EventApp</span>
-        </div>
+        </Link>
 
         <h1 className="auth-title">Create your account</h1>
         <p className="auth-subtitle">Fill in the details below to get started</p>
@@ -62,6 +62,7 @@ export default function RegisterPage() {
               <select id="role" className="form-select" value={form.role} onChange={set('role')}>
                 <option value="ATTENDEE">Attendee</option>
                 <option value="ORGANIZER">Organizer</option>
+                <option value="ADMIN">Admin</option>
               </select>
             </div>
           </div>
@@ -128,9 +129,14 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <button className="btn btn-primary btn-lg" type="submit" disabled={loading}>
-            {loading ? 'Creating account…' : 'Create Account'}
-          </button>
+          <div className="form-actions" style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+            <Link to="/" className="btn btn-lg" style={{ flex: 1, textAlign: 'center', backgroundColor: '#e2e8f0', color: '#334155' }}>
+              Cancel
+            </Link>
+            <button className="btn btn-primary btn-lg" type="submit" disabled={loading} style={{ flex: 2 }}>
+              {loading ? 'Creating account…' : 'Create Account'}
+            </button>
+          </div>
         </form>
 
         <p className="auth-footer">

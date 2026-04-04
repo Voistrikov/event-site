@@ -14,8 +14,7 @@ export interface User {
   latitude: number | null;
   longitude: number | null;
   taxId: string;
-  role: Role;
-  status: UserStatus;
+  avatarUrl: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -33,7 +32,7 @@ export interface RegisterFormData {
   taxId: string;
   latitude?: number | undefined;
   longitude?: number | undefined;
-  role: 'ATTENDEE' | 'ORGANIZER';
+  role: 'ATTENDEE' | 'ORGANIZER' | 'ADMIN';
 }
 
 export interface LoginFormData {

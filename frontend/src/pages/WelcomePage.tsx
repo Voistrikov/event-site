@@ -1,7 +1,16 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import '../styles/WelcomePage.css';
 
 export default function WelcomePage() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/', { replace: true });
+  };
+
   return (
     <div className="welcome-layout">
       {/* Top Navbar specifically for Welcome Page */}
@@ -14,9 +23,20 @@ export default function WelcomePage() {
         {/* Links requested: αναζήτηση σπιτιού, διαχειριστής, πελάτης + Login field right */}
         <div className="welcome-nav-links">
           <Link to="/search">Αναζήτηση σπιτιού</Link>
-          <Link to="/admin">Διαχειριστής</Link>
-          <Link to="/events">Πελάτης</Link>
-          <Link to="/login" className="login-btn">Login</Link>
+          {!user ? (
+            <>
+              <Link to="/login">Διαχειριστής</Link>
+              <Link to="/login">Πελάτης</Link>
+              <Link to="/login" className="login-btn">Login</Link>
+            </>
+          ) : (
+            <>
+              <Link to="/home">Εφαρμογή</Link>
+              <button onClick={handleLogout} className="login-btn" style={{ border: 'none', cursor: 'pointer' }}>
+                Logout
+              </button>
+            </>
+          )}
         </div>
       </nav>
 

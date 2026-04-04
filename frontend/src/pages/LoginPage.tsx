@@ -35,10 +35,10 @@ export default function LoginPage() {
   return (
     <div className="auth-wrapper">
       <div className="auth-card">
-        <div className="auth-logo">
+        <Link to="/" className="auth-logo" style={{ textDecoration: 'none' }}>
           <div className="auth-logo-icon">E</div>
           <span className="auth-logo-text">EventApp</span>
-        </div>
+        </Link>
 
         <h1 className="auth-title">Welcome back</h1>
         <p className="auth-subtitle">Sign in to your account to continue</p>
@@ -74,9 +74,14 @@ export default function LoginPage() {
             />
           </div>
 
-          <button className="btn btn-primary btn-lg" type="submit" disabled={loading}>
-            {loading ? 'Signing in…' : 'Sign In'}
-          </button>
+          <div className="form-actions" style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+            <Link to="/" className="btn btn-lg" style={{ flex: 1, textAlign: 'center', backgroundColor: '#e2e8f0', color: '#334155' }}>
+              Cancel
+            </Link>
+            <button className="btn btn-primary btn-lg" type="submit" disabled={loading} style={{ flex: 2 }}>
+              {loading ? 'Signing in…' : 'Sign In'}
+            </button>
+          </div>
         </form>
 
         <p className="auth-footer">

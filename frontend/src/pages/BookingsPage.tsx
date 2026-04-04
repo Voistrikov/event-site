@@ -25,7 +25,7 @@ export default function BookingsPage() {
 
   return (
     <div className="bookings-page">
-      <h1>My Bookings</h1>
+      <h1 className="profile-page-title">My Bookings</h1>
       <BookingList bookings={bookings} onCancel={handleCancel} />
     </div>
   );

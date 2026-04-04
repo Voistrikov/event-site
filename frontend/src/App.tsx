@@ -17,6 +17,8 @@ import CreateEventPage    from './pages/CreateEventPage';
 import EditEventPage      from './pages/EditEventPage';
 import AdminPage          from './pages/AdminPage';
 import NotFoundPage       from './pages/NotFoundPage';
+import ProfileLayout    from './components/layout/ProfileLayout';
+import ProfileInfoPage from './pages/ProfileInfoPage';
 
 export default function App() {
   const { initialize } = useAuth();
@@ -36,67 +38,55 @@ export default function App() {
       <Route path="/pending-approval"  element={<PendingApprovalPage />} />
       <Route path="/events"            element={<EventsPage />} />
 
-      {/* ── Authenticated (any approved role) ───────────────────────────── */}
+      {/* ── Authenticated Dashboard Layout ──────────────────────────────── */}
       <Route
-        path="/home"
         element={
           <ProtectedRoute>
-            <HomePage />
+            <ProfileLayout />
           </ProtectedRoute>
         }
-      />
-      <Route
-        path="/bookings"
-        element={
-          <ProtectedRoute>
-            <BookingsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/messaging"
-        element={
-          <ProtectedRoute>
-            <MessagingPage />
-          </ProtectedRoute>
-        }
-      />
+      >
+        <Route path="/home"           element={<HomePage />} />
+        <Route path="/profile/info"   element={<ProfileInfoPage />} />
+        <Route path="/bookings"       element={<BookingsPage />} />
+        <Route path="/messaging"      element={<MessagingPage />} />
 
-      {/* ── Organizer ───────────────────────────────────────────────────── */}
-      <Route
-        path="/manage-events"
-        element={
-          <ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}>
-            <ManageEventsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/events/create"
-        element={
-          <ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}>
-            <CreateEventPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/events/:id/edit"
-        element={
-          <ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}>
-            <EditEventPage />
-          </ProtectedRoute>
-        }
-      />
+        {/* ── Organizer ───────────────────────────────────────────────────── */}
+        <Route
+          path="/manage-events"
+          element={
+            <ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}>
+              <ManageEventsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/events/create"
+          element={
+            <ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}>
+              <CreateEventPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/events/:id/edit"
+          element={
+            <ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}>
+              <EditEventPage />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* ── Admin ───────────────────────────────────────────────────────── */}
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute allowedRoles={['ADMIN']}>
-            <AdminPage />
-          </ProtectedRoute>
-        }
-      />
+        {/* ── Admin ───────────────────────────────────────────────────────── */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <AdminPage />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
 
       {/* ── Fallbacks ───────────────────────────────────────────────────── */}
       <Route path="/index.html" element={<Navigate to="/" replace />} />

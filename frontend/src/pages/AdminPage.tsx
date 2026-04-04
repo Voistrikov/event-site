@@ -73,22 +73,11 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="page-wrapper">
-      <header className="topbar">
-        <div className="topbar-brand">
-          <div className="topbar-brand-icon">E</div>
-          EventApp
-        </div>
-        <div className="topbar-actions">
-          <Link to="/home" className="btn btn-secondary btn-sm">← Dashboard</Link>
-        </div>
-      </header>
-
-      <main className="page-content">
-        <div className="page-header">
-          <h1 className="page-title">🛡️ Admin Panel</h1>
-          <p className="page-subtitle">Manage platform users and their approval status</p>
-        </div>
+    <div className="admin-page">
+      <div className="profile-page-header">
+        <h1 className="profile-page-title">🛡️ Admin Panel</h1>
+        <p className="page-subtitle">Manage platform users and their approval status</p>
+      </div>
 
         {error && (
           <div className="alert alert-error" style={{ marginBottom: 20 }}>{error}</div>
@@ -232,7 +221,6 @@ export default function AdminPage() {
             </>
           )}
         </div>
-      </main>
     </div>
   );
 }

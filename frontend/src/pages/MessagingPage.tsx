@@ -12,7 +12,7 @@ export default function MessagingPage() {
 
   return (
     <div className="messaging-page">
-      <h1>Messages</h1>
+      <h1 className="profile-page-title">Messages</h1>
       <nav>
         <button onClick={() => setTab('inbox')}>Inbox</button>
         <button onClick={() => setTab('sent')}>Sent</button>
