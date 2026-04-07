@@ -19,6 +19,7 @@ import AdminPage          from './pages/AdminPage';
 import NotFoundPage       from './pages/NotFoundPage';
 import ProfileLayout    from './components/layout/ProfileLayout';
 import ProfileInfoPage from './pages/ProfileInfoPage';
+import EventDetailsPage from './pages/EventDetailsPage';
 
 export default function App() {
   const { initialize } = useAuth();
@@ -37,6 +38,8 @@ export default function App() {
       <Route path="/register"          element={<RegisterPage />} />
       <Route path="/pending-approval"  element={<PendingApprovalPage />} />
       <Route path="/events"            element={<EventsPage />} />
+      <Route path="/search"            element={<EventsPage />} />
+      <Route path="/events/:id"        element={<EventDetailsPage />} />
 
       {/* ── Authenticated Dashboard Layout ──────────────────────────────── */}
       <Route

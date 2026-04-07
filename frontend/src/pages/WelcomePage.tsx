@@ -27,13 +27,13 @@ export default function WelcomePage() {
             <>
               <Link to="/login">Διαχειριστής</Link>
               <Link to="/login">Πελάτης</Link>
-              <Link to="/login" className="login-btn">Login</Link>
+              <Link to="/login" className="login-btn">Σύνδεση</Link>
             </>
           ) : (
             <>
               <Link to="/home">Εφαρμογή</Link>
               <button onClick={handleLogout} className="login-btn" style={{ border: 'none', cursor: 'pointer' }}>
-                Logout
+                Αποσύνδεση
               </button>
             </>
           )}
@@ -46,7 +46,7 @@ export default function WelcomePage() {
           Book Your Stay<br />With Ease
         </h1>
         <div className="hero-buttons">
-          <Link to="/place-home" className="hero-btn">PLACE YOUR HOME</Link>
+          <Link to="/login" className="hero-btn">PLACE YOUR HOME</Link>
           <Link to="/search" className="hero-btn hero-btn-outline">BOOK YOUR STAY</Link>
         </div>
       </div>
