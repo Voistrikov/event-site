@@ -4,9 +4,10 @@ import { formatDate } from '../../utils/dateFormat';
 
 interface EventCardProps {
   event: Event;
+  onViewDetails?: (event: Event) => void;
 }
 
-export default function EventCard({ event }: EventCardProps) {
+export default function EventCard({ event, onViewDetails }: EventCardProps) {
   const defaultImage = 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=800&q=80';
   const imageUrl = event.photos && event.photos.length > 0 
     ? `http://localhost:3000/uploads/${event.photos[0].filename}` 
@@ -40,9 +41,13 @@ export default function EventCard({ event }: EventCardProps) {
         </div>
 
         <div className="event-card-footer">
-          <Link to={`/events/${event.id}`} className="event-card-btn">
+          <button 
+            className="event-card-btn" 
+            style={{ width: '100%', border: 'none', cursor: 'pointer' }}
+            onClick={(e) => { e.preventDefault(); onViewDetails?.(event); }}
+          >
             Προβολή Αγγελίας
-          </Link>
+          </button>
         </div>
       </div>
     </div>

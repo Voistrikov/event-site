@@ -3,24 +3,62 @@ import { useMessages } from '../hooks/useMessages';
 import MessageInbox from '../components/messaging/MessageInbox';
 import MessageSent from '../components/messaging/MessageSent';
 import ComposeMessage from '../components/messaging/ComposeMessage';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import '../styles/MessagingPage.css';
 
 export default function MessagingPage() {
   const [tab, setTab] = useState<'inbox' | 'sent' | 'compose'>('inbox');
   const { inbox, sent, loading, refresh } = useMessages();
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="messaging-page">
-      <h1 className="profile-page-title">Messages</h1>
-      <nav>
-        <button onClick={() => setTab('inbox')}>Inbox</button>
-        <button onClick={() => setTab('sent')}>Sent</button>
-        <button onClick={() => setTab('compose')}>Compose</button>
-      </nav>
-      {tab === 'inbox' && <MessageInbox messages={inbox} />}
-      {tab === 'sent' && <MessageSent messages={sent} />}
-      {tab === 'compose' && <ComposeMessage onSent={refresh} />}
+    <div className="messaging-page-container">
+      <div className="messaging-header">
+        <h1 className="messaging-title">Μηνύματα</h1>
+      </div>
+      
+      <div className="messaging-layout">
+        {/* Sidebar */}
+        <aside className="messaging-sidebar">
+          <nav className="sidebar-nav">
+            <button 
+              className={`nav-item ${tab === 'inbox' ? 'active' : ''}`} 
+              onClick={() => setTab('inbox')}
+            >
+              <span className="nav-icon">📥</span> Εισερχόμενα
+            </button>
+            <button 
+              className={`nav-item ${tab === 'sent' ? 'active' : ''}`} 
+              onClick={() => setTab('sent')}
+            >
+              <span className="nav-icon">📤</span> Απεσταλμένα
+            </button>
+            <button 
+              className={`nav-item ${tab === 'compose' ? 'active' : ''}`} 
+              onClick={() => setTab('compose')}
+            >
+              <span className="nav-icon">✍️</span> Νέο Μήνυμα
+            </button>
+          </nav>
+        </aside>
+
+        {/* Main Content Area */}
+        <main className="messaging-content">
+          <div className="content-header">
+            <h2>
+              {tab === 'inbox' && 'Εισερχόμενα Μηνύματα'}
+              {tab === 'sent' && 'Απεσταλμένα Μηνύματα'}
+              {tab === 'compose' && 'Δημιουργία Νέου Μηνύματος'}
+            </h2>
+          </div>
+          <div className="content-body">
+            {tab === 'inbox' && <MessageInbox messages={inbox} />}
+            {tab === 'sent' && <MessageSent messages={sent} />}
+            {tab === 'compose' && <ComposeMessage onSent={() => { refresh(); setTab('sent'); }} />}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

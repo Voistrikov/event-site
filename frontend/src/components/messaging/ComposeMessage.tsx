@@ -20,17 +20,50 @@ export default function ComposeMessage({ onSent }: ComposeMessageProps) {
       setBody('');
       onSent?.();
     } catch {
-      setError('Failed to send message.');
+      setError('Αποτυχία αποστολής μηνύματος.');
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="compose-form">
-      {error && <p className="error">{error}</p>}
-      <input value={recipientId} onChange={(e) => setRecipientId(e.target.value)} placeholder="Recipient ID" required />
-      <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject" required />
-      <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Message body" required />
-      <button type="submit">Send</button>
+      {error && <div className="error-message">{error}</div>}
+      
+      <div className="form-group">
+        <label>ID Παραλήπτη</label>
+        <input 
+          className="form-input"
+          value={recipientId} 
+          onChange={(e) => setRecipientId(e.target.value)} 
+          placeholder="Εισάγετε το ID του παραλήπτη" 
+          required 
+        />
+      </div>
+
+      <div className="form-group">
+        <label>Θέμα</label>
+        <input 
+          className="form-input"
+          value={subject} 
+          onChange={(e) => setSubject(e.target.value)} 
+          placeholder="Σύντομο θέμα" 
+          required 
+        />
+      </div>
+
+      <div className="form-group">
+        <label>Μήνυμα</label>
+        <textarea 
+          className="form-textarea"
+          value={body} 
+          onChange={(e) => setBody(e.target.value)} 
+          placeholder="Γράψτε το μήνυμά σας εδώ..." 
+          required 
+        />
+      </div>
+
+      <button type="submit" className="btn-send">
+        <span>✈️</span> Αποστολή
+      </button>
     </form>
   );
 }

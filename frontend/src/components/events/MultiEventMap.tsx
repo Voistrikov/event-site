@@ -5,9 +5,10 @@ import 'leaflet/dist/leaflet.css';
 
 interface MultiEventMapProps {
   events: Event[];
+  onViewDetails?: (event: Event) => void;
 }
 
-export default function MultiEventMap({ events }: MultiEventMapProps) {
+export default function MultiEventMap({ events, onViewDetails }: MultiEventMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
@@ -90,11 +91,12 @@ export default function MultiEventMap({ events }: MultiEventMapProps) {
                className: 'custom-leaflet-popup'
             });
 
-          marker.on('popupopen', () => {
+           marker.on('popupopen', () => {
              const btn = document.querySelector(`.map-popup-btn[data-id="${event.id}"]`);
              if (btn) {
                btn.addEventListener('click', () => {
-                 navigate(`/events/${event.id}`);
+                 if (onViewDetails) onViewDetails(event);
+                 else navigate(`/events/${event.id}`);
                  marker.closePopup();
                });
              }

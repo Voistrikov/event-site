@@ -9,10 +9,17 @@ export function useMessages() {
 
   const refresh = async () => {
     setLoading(true);
-    const [inboxRes, sentRes] = await Promise.all([getInbox(), getSent()]);
-    setInbox(inboxRes.data);
-    setSent(sentRes.data);
-    setLoading(false);
+    try {
+      const [inboxRes, sentRes] = await Promise.all([getInbox(), getSent()]);
+      setInbox(inboxRes.data);
+      setSent(sentRes.data);
+    } catch (err) {
+      console.error('Failed to load messages', err);
+      setInbox([]);
+      setSent([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { refresh(); }, []);

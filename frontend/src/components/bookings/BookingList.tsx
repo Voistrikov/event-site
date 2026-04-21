@@ -10,14 +10,30 @@ export default function BookingList({ bookings, onCancel }: BookingListProps) {
   return (
     <ul className="booking-list">
       {bookings.map((b) => (
-        <li key={b.id}>
-          <span>Booking #{b.id.slice(0, 8)}</span>
-          <span>Qty: {b.quantity}</span>
-          <span>Total: €{b.totalPrice}</span>
-          <span>{formatDate(b.createdAt)}</span>
-          <span className={`status-${b.status}`}>{b.status}</span>
+        <li key={b.id} className="booking-card">
+          <div className="booking-card-header">
+            <span className="booking-id">Κράτηση #{b.id.slice(0, 8)}</span>
+            <span className="booking-date">{formatDate(b.createdAt)}</span>
+          </div>
+          <div className="booking-card-body">
+            <div className="booking-detail">
+              <span className="booking-detail-label">Ποσότητα</span>
+              <span className="booking-detail-value">{b.quantity}</span>
+            </div>
+            <div className="booking-detail">
+              <span className="booking-detail-label">Σύνολο</span>
+              <span className="booking-detail-value">€{b.totalPrice}</span>
+            </div>
+            <div className="booking-detail">
+              <span className={`booking-status status-${b.status}`}>
+                {b.status === 'confirmed' ? 'Επιβεβαιώθηκε' : b.status === 'cancelled' ? 'Ακυρώθηκε' : 'Σε αναμονή'}
+              </span>
+            </div>
+          </div>
           {onCancel && b.status === 'confirmed' && (
-            <button onClick={() => onCancel(b.id)}>Cancel</button>
+            <div className="booking-actions">
+              <button className="btn-cancel-booking" onClick={() => onCancel(b.id)}>Ακύρωση Κράτησης</button>
+            </div>
           )}
         </li>
       ))}
