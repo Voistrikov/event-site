@@ -79,3 +79,23 @@ export async function updateUserStatus(
 
   return user as UserResponseDto;
 }
+
+export async function getAllEventsForExport() {
+  return prisma.event.findMany({
+    include: {
+      ticketTypes: true,
+      bookings: {
+        include: {
+          user: true
+        }
+      },
+      organizer: true,
+      photos: true,
+      categories: {
+        include: {
+          category: true
+        }
+      }
+    }
+  });
+}

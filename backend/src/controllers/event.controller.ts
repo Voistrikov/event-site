@@ -3,9 +3,21 @@ import { prisma } from '../config/prisma.js';
 
 export const getEvents = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { category, search, dateFrom, rooms, beds, lat, lng } = req.query;
+    const { category, search, dateFrom, rooms, beds, lat, lng, maxPrice, organizerId } = req.query;
 
     const where: any = {};
+
+    if (organizerId && typeof organizerId === 'string') {
+      where.organizerId = organizerId;
+    }
+
+    if (maxPrice) {
+      where.ticketTypes = {
+        some: {
+          price: { lte: Number(maxPrice) }
+        }
+      };
+    }
 
     if (search && typeof search === 'string') {
       where.OR = [
@@ -89,6 +101,20 @@ export const getEvents = async (req: Request, res: Response, next: NextFunction)
       events,
       totalPages: Math.ceil(total / limit)
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+import { getRecommendations } from '../services/recommendation.service.js';
+
+export const getRecommendedEventsHandler = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Determine userId from req.user (if authenticated)
+    const userId = (req as any).user?.id; // Assuming authenticate middleware sets req.user
+    
+    const recommendations = await getRecommendations(userId);
+    res.json({ events: recommendations });
   } catch (error) {
     next(error);
   }

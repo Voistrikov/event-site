@@ -4,12 +4,19 @@ import type { Event } from '../types/event.types';
 import EventTable from '../components/events/EventTable';
 import { Link } from 'react-router-dom';
 
+import { useAuth } from '../hooks/useAuth';
+
 export default function ManageEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
+  const { user } = useAuth();
 
-  const load = () => getEvents().then((res) => setEvents(res.data));
+  const load = () => {
+    if (user) {
+      getEvents({ organizerId: user.id }).then((res) => setEvents(res.data.events || res.data));
+    }
+  };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [user]);
 
   const handleDelete = async (id: string) => {
     await deleteEvent(id);

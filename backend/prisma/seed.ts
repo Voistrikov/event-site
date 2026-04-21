@@ -1,12 +1,10 @@
-import { PrismaClient } from '../src/generated/prisma/client.js';
+import { prisma } from '../src/config/prisma.js';
 import bcrypt from 'bcrypt';
 import * as dotenv from 'dotenv';
 import path from 'path';
 
 dotenv.config({ path: path.join(process.cwd(), '.env') });
 dotenv.config({ path: path.join(process.cwd(), '../.env') }); // also check root if needed
-
-const prisma = new PrismaClient();
 
 async function main(): Promise<void> {
   const passwordHash = await bcrypt.hash('123', 12);
@@ -156,9 +154,45 @@ async function main(): Promise<void> {
         }
       });
     }
+    // Create mock bookings for algorithm demonstration
+    const customerUser = await prisma.user.findUnique({ where: { username: 'customer' } });
+    if (customerUser) {
+      const ticket1 = await prisma.ticketType.findUnique({ where: { id: 'ticket-prop-1-acropolis-view' } });
+      const ticket2 = await prisma.ticketType.findUnique({ where: { id: 'ticket-prop-2-plaka-studio' } });
+
+      if (ticket1 && ticket2) {
+        await prisma.booking.upsert({
+          where: { id: 'mock-booking-1' },
+          update: {},
+          create: {
+            id: 'mock-booking-1',
+            eventId: 'prop-1-acropolis-view',
+            userId: customerUser.id,
+            ticketTypeId: ticket1.id,
+            numberOfTickets: 1,
+            totalCost: ticket1.price,
+            status: 'CONFIRMED'
+          }
+        });
+
+        await prisma.booking.upsert({
+          where: { id: 'mock-booking-2' },
+          update: {},
+          create: {
+            id: 'mock-booking-2',
+            eventId: 'prop-2-plaka-studio',
+            userId: customerUser.id,
+            ticketTypeId: ticket2.id,
+            numberOfTickets: 1,
+            totalCost: ticket2.price,
+            status: 'CONFIRMED'
+          }
+        });
+      }
+    }
   }
 
-  console.log('Seed complete: admin, owner, and customer users updated to password 123. Mock properties added.');
+  console.log('Seed complete: admin, owner, and customer users updated to password 123. Mock properties and bookings added.');
 }
 
 main()

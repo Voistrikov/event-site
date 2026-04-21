@@ -3,6 +3,9 @@ import axiosInstance from './axiosInstance';
 export const getEvents = (params?: Record<string, unknown>) =>
   axiosInstance.get('/events', { params });
 
+export const getRecommendedEvents = () =>
+  axiosInstance.get('/events/recommended');
+
 export const getEvent = (id: string) => axiosInstance.get(`/events/${id}`);
 
 export const createEvent = (data: FormData | Record<string, unknown>) =>

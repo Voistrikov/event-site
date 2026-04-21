@@ -20,8 +20,10 @@ export interface Event {
   city?: string;
   latitude?: number;
   longitude?: number;
-  startDate: string;
-  endDate: string;
+  startDate?: string;
+  endDate?: string;
+  startDateTime?: string;
+  endDateTime?: string;
   organizerId: string;
   ticketTypes: TicketType[];
   photos?: EventPhoto[];

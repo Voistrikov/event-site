@@ -21,3 +21,9 @@ export const listUsers = (params?: ListUsersParams) =>
 
 export const updateUserStatus = (id: string, status: 'APPROVED' | 'REJECTED') =>
   axiosInstance.patch<{ user: User }>(`/admin/users/${id}/status`, { status });
+
+export const exportEventsJson = () =>
+  axiosInstance.get('/admin/export/events/json', { responseType: 'blob' });
+
+export const exportEventsXml = () =>
+  axiosInstance.get('/admin/export/events/xml', { responseType: 'blob' });

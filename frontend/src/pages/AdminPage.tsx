@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { listUsers, updateUserStatus } from '../api/adminApi';
+import { listUsers, updateUserStatus, exportEventsJson, exportEventsXml } from '../api/adminApi';
 import type { ListUsersResponse } from '../api/adminApi';
 import type { User, Role, UserStatus } from '../types/user.types';
 
@@ -38,7 +38,7 @@ export default function AdminPage() {
   const [filterRole,   setFilterRole]   = useState<Role | ''>('');
   const [filterStatus, setFilterStatus] = useState<UserStatus | ''>('');
   const [page, setPage] = useState(1);
-  const [acting, setActing] = useState<string | null>(null); // userId being updated
+  const [acting, setActing] = useState<string | null>(null);
 
   const load = async (p = page) => {
     setLoading(true);
@@ -63,7 +63,6 @@ export default function AdminPage() {
     setActing(user.id);
     try {
       await updateUserStatus(user.id, status);
-      // Refresh current page
       await load(page);
     } catch {
       setError(`Failed to ${status.toLowerCase()} user.`);
@@ -72,11 +71,36 @@ export default function AdminPage() {
     }
   };
 
+  const handleExport = async (format: 'json' | 'xml') => {
+    try {
+      const res = format === 'json' ? await exportEventsJson() : await exportEventsXml();
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `events.${format}`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+    } catch (err) {
+      setError(`Failed to export ${format.toUpperCase()}`);
+    }
+  };
+
   return (
     <div className="admin-page">
-      <div className="profile-page-header">
-        <h1 className="profile-page-title">🛡️ Admin Panel</h1>
-        <p className="page-subtitle">Manage platform users and their approval status</p>
+      <div className="profile-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1 className="profile-page-title">🛡️ Πίνακας Ελέγχου</h1>
+          <p className="page-subtitle">Διαχείριση χρηστών και εξαγωγή δεδομένων (XML/JSON)</p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button className="btn btn-secondary btn-sm" onClick={() => handleExport('json')}>
+            ⬇️ Export JSON
+          </button>
+          <button className="btn btn-secondary btn-sm" onClick={() => handleExport('xml')}>
+            ⬇️ Export XML
+          </button>
+        </div>
       </div>
 
         {error && (
@@ -85,7 +109,7 @@ export default function AdminPage() {
 
         <div className="table-card">
           <div className="table-toolbar">
-            <span className="table-toolbar-title">Users</span>
+            <span className="table-toolbar-title">Χρήστες Πλατφόρμας</span>
 
             {/* Filters */}
             <div className="filters-row">
@@ -114,7 +138,7 @@ export default function AdminPage() {
                 onClick={() => load(1)}
                 disabled={loading}
               >
-                {loading ? 'Loading…' : 'Load Users'}
+                {loading ? 'Φόρτωση…' : 'Φόρτωση Χρηστών'}
               </button>
             </div>
           </div>

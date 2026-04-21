@@ -1,5 +1,5 @@
 interface EventFiltersProps {
-  onFilter: (filters: { category?: string; search?: string; dateFrom?: string; rooms?: number; beds?: number }) => void;
+  onFilter: (filters: { category?: string; search?: string; dateFrom?: string; rooms?: number; beds?: number; maxPrice?: number }) => void;
 }
 
 export default function EventFilters({ onFilter }: EventFiltersProps) {
@@ -43,6 +43,13 @@ export default function EventFilters({ onFilter }: EventFiltersProps) {
         placeholder="Κρεβάτια+"
         onChange={(e) => onFilter({ beds: e.target.value ? parseInt(e.target.value) : undefined })}
         style={{ padding: '8px 12px', border: '1px solid #ccc', borderRadius: '4px', width: '100px' }}
+      />
+      <input
+        type="number"
+        min="1"
+        placeholder="Μέγιστη Τιμή (€)"
+        onChange={(e) => onFilter({ maxPrice: e.target.value ? parseInt(e.target.value) : undefined })}
+        style={{ padding: '8px 12px', border: '1px solid #ccc', borderRadius: '4px', width: '130px' }}
       />
     </div>
   );
