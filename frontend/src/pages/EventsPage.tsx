@@ -13,8 +13,17 @@ import '../styles/EventsPage.css';
 export default function EventsPage() {
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({});
+  const [mapLocation, setMapLocation] = useState<{lat: number; lng: number} | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const { events, loading } = useEvents({ ...filters, page });
+  
+  // Combine filters with mapLocation for the backend
+  const activeFilters = { ...filters, page, limit: 9 };
+  if (mapLocation) {
+    (activeFilters as any).lat = mapLocation.lat;
+    (activeFilters as any).lng = mapLocation.lng;
+  }
+  
+  const { events, loading, totalPages } = useEvents(activeFilters);
 
   return (
     <div className="events-split-container">
@@ -53,14 +62,30 @@ export default function EventsPage() {
                 No properties found matching your criteria.
               </p>
             )}
-            <Pagination page={page} totalPages={10} onPageChange={setPage} />
+            {totalPages > 1 && (
+              <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+            )}
           </>
         )}
       </div>
 
       {/* Map Section */}
       <div className="events-map-section">
-        <MultiEventMap events={events} onViewDetails={setSelectedEvent} />
+        {mapLocation && (
+          <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 1000, background: 'white', padding: '8px 12px', borderRadius: 8, boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#333' }}>Αναζήτηση Κοντά σε Επιλεγμένο Σημείο</span>
+            <button 
+              onClick={() => setMapLocation(null)}
+              style={{ marginLeft: 10, background: '#e53935', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer', padding: '2px 6px', fontSize: '0.7rem' }}
+            >Καθαρισμός</button>
+          </div>
+        )}
+        <MultiEventMap 
+          events={events} 
+          onViewDetails={setSelectedEvent} 
+          mapLocation={mapLocation}
+          onMapClick={(lat, lng) => setMapLocation({lat, lng})}
+        />
       </div>
     </div>
   );

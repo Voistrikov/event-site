@@ -12,10 +12,10 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
     <table className="event-table">
       <thead>
         <tr>
-          <th>Title</th>
-          <th>Category</th>
-          <th>Date</th>
-          <th>Actions</th>
+          <th>Τίτλος</th>
+          <th>Κατηγορία</th>
+          <th>Ημερομηνία</th>
+          <th>Ενέργειες</th>
         </tr>
       </thead>
       <tbody>
@@ -25,9 +25,9 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
             <td>{e.category}</td>
             <td>{formatDate(e.startDate)}</td>
             <td>
-              <Link to={`/events/${e.id}/edit`}>Edit</Link>
+              <Link to={`/events/${e.id}/edit`}>Επεξεργασία</Link>
               {onDelete && (
-                <button onClick={() => onDelete(e.id)}>Delete</button>
+                <button onClick={() => onDelete(e.id)} style={{ marginLeft: '10px' }}>Διαγραφή</button>
               )}
             </td>
           </tr>

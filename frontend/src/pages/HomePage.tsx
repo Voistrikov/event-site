@@ -19,31 +19,31 @@ export default function HomePage() {
       <div className="dashboard-grid">
         {/* Browse Events — visible to all */}
         <Link to="/events" className="dash-card">
-          <div className="dash-card-icon" style={{ background: '#e0e7ff' }}>🎟️</div>
-          <div className="dash-card-title">Browse Events</div>
-          <div className="dash-card-desc">Discover upcoming events near you</div>
+          <div className="dash-card-icon" style={{ background: '#e0e7ff' }}>🏠</div>
+          <div className="dash-card-title">Αναζήτηση Ακινήτων</div>
+          <div className="dash-card-desc">Ανακαλύψτε διαθέσιμα καταλύματα στην περιοχή σας</div>
         </Link>
 
         {/* My Bookings — all approved users */}
         <Link to="/bookings" className="dash-card">
           <div className="dash-card-icon" style={{ background: '#f0fdf4' }}>📋</div>
-          <div className="dash-card-title">My Bookings</div>
-          <div className="dash-card-desc">View and manage your reservations</div>
+          <div className="dash-card-title">Οι Κρατήσεις μου</div>
+          <div className="dash-card-desc">Προβολή και διαχείριση των κρατήσεών σας</div>
         </Link>
 
         {/* Messages — all approved users */}
         <Link to="/messaging" className="dash-card">
           <div className="dash-card-icon" style={{ background: '#fef9c3' }}>💬</div>
-          <div className="dash-card-title">Messages</div>
-          <div className="dash-card-desc">Send and receive messages</div>
+          <div className="dash-card-title">Μηνύματα</div>
+          <div className="dash-card-desc">Επικοινωνία με ιδιοκτήτες ή πελάτες</div>
         </Link>
 
         {/* Organizer tools */}
         {isOrganizer && (
           <Link to="/manage-events" className="dash-card">
-            <div className="dash-card-icon" style={{ background: '#ede9fe' }}>📅</div>
-            <div className="dash-card-title">Manage Events</div>
-            <div className="dash-card-desc">Create and manage your events</div>
+            <div className="dash-card-icon" style={{ background: '#ede9fe' }}>🔑</div>
+            <div className="dash-card-title">Τα Ακίνητά μου</div>
+            <div className="dash-card-desc">Διαχείριση και καταχώρηση νέων ακινήτων</div>
           </Link>
         )}
 
@@ -51,8 +51,8 @@ export default function HomePage() {
         {isAdmin && (
           <Link to="/admin" className="dash-card">
             <div className="dash-card-icon" style={{ background: '#fee2e2' }}>🛡️</div>
-            <div className="dash-card-title">Admin Panel</div>
-            <div className="dash-card-desc">Manage users and platform settings</div>
+            <div className="dash-card-title">Πίνακας Ελέγχου</div>
+            <div className="dash-card-desc">Διαχείριση πλατφόρμας και χρηστών</div>
           </Link>
         )}
       </div>

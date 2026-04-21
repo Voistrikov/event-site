@@ -36,8 +36,8 @@ export default function LoginPage() {
     <div className="auth-wrapper">
       <div className="auth-card">
         <Link to="/" className="auth-logo" style={{ textDecoration: 'none' }}>
-          <div className="auth-logo-icon">E</div>
-          <span className="auth-logo-text">EventApp</span>
+          <div className="auth-logo-icon" style={{ backgroundColor: '#1b3858', color: 'white', fontWeight: 'bold' }}>B</div>
+          <span className="auth-logo-text" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, letterSpacing: '1px', color: '#1b3858' }}>BOOKING PLACE</span>
         </Link>
 
         <h1 className="auth-title">Welcome back</h1>

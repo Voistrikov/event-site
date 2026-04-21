@@ -6,12 +6,15 @@ import 'leaflet/dist/leaflet.css';
 interface MultiEventMapProps {
   events: Event[];
   onViewDetails?: (event: Event) => void;
+  mapLocation?: {lat: number, lng: number} | null;
+  onMapClick?: (lat: number, lng: number) => void;
 }
 
-export default function MultiEventMap({ events, onViewDetails }: MultiEventMapProps) {
+export default function MultiEventMap({ events, onViewDetails, mapLocation, onMapClick }: MultiEventMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const targetMarkerRef = useRef<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,6 +42,27 @@ export default function MultiEventMap({ events, onViewDetails }: MultiEventMapPr
           attribution: '&copy; OpenStreetMap &copy; CARTO',
           maxZoom: 19,
         }).addTo(map);
+
+        // Map Click Listener
+        map.on('click', (e: any) => {
+          if (onMapClick) onMapClick(e.latlng.lat, e.latlng.lng);
+        });
+      }
+
+      // Handle Target Marker (Map Location)
+      if (targetMarkerRef.current) {
+        targetMarkerRef.current.remove();
+        targetMarkerRef.current = null;
+      }
+
+      if (mapLocation) {
+        const targetIcon = L.divIcon({
+          className: 'custom-target-marker',
+          html: `<div style="width: 20px; height: 20px; background: #34aadc; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(0,0,0,0.5);"></div>`,
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
+        });
+        targetMarkerRef.current = L.marker([mapLocation.lat, mapLocation.lng], { icon: targetIcon, zIndexOffset: 1000 }).addTo(map);
       }
 
       // Clear old markers

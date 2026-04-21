@@ -19,15 +19,15 @@ export default function ProfileLayout() {
       {/* Top Header */}
       <header className="profile-header">
         <Link to="/" className="profile-brand">
-          <div className="profile-brand-icon">E</div>
-          <span>EventApp</span>
+          <div className="profile-brand-icon" style={{ backgroundColor: '#1b3858', color: 'white', fontWeight: 'bold' }}>B</div>
+          <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, letterSpacing: '1px', color: '#1b3858' }}>BOOKING PLACE</span>
         </Link>
         <div className="profile-header-actions">
           <span className="profile-user-greeting">
-            Hello, <strong>{user?.firstName ?? user?.username}</strong>
+            Γεια σας, <strong>{user?.firstName ?? user?.username}</strong>
           </span>
           <button className="profile-logout-btn" onClick={handleLogout}>
-            Sign Out
+            Αποσύνδεση
           </button>
         </div>
       </header>
@@ -42,40 +42,40 @@ export default function ProfileLayout() {
               className={({ isActive }) => `profile-nav-link ${isActive ? 'active' : ''}`}
             >
               <span className="nav-icon">🏠</span> 
-              Overview
+              Αρχική
             </NavLink>
             <NavLink 
               to="/profile/info" 
               className={({ isActive }) => `profile-nav-link ${isActive ? 'active' : ''}`}
             >
               <span className="nav-icon">👤</span> 
-              Προβολή Προφίλ
+              Προφίλ
             </NavLink>
             <NavLink 
               to="/bookings" 
               className={({ isActive }) => `profile-nav-link ${isActive ? 'active' : ''}`}
             >
               <span className="nav-icon">📋</span> 
-              My Bookings
+              Οι Κρατήσεις μου
             </NavLink>
             <NavLink 
               to="/messaging" 
               className={({ isActive }) => `profile-nav-link ${isActive ? 'active' : ''}`}
             >
               <span className="nav-icon">💬</span> 
-              Messages
+              Μηνύματα
             </NavLink>
 
             {isOrganizer && (
               <>
                 <div className="nav-divider"></div>
-                <div className="nav-group-title">Organizer</div>
+                <div className="nav-group-title">Ιδιοκτήτης</div>
                 <NavLink 
                   to="/manage-events" 
                   className={({ isActive }) => `profile-nav-link ${isActive ? 'active' : ''}`}
                 >
-                  <span className="nav-icon">📅</span> 
-                  Manage Events
+                  <span className="nav-icon">🔑</span> 
+                  Τα Ακίνητά μου
                 </NavLink>
               </>
             )}
@@ -83,13 +83,13 @@ export default function ProfileLayout() {
             {isAdmin && (
               <>
                 <div className="nav-divider"></div>
-                <div className="nav-group-title">Admin</div>
+                <div className="nav-group-title">Διαχείριση Συστήματος</div>
                 <NavLink 
                   to="/admin" 
                   className={({ isActive }) => `profile-nav-link ${isActive ? 'active' : ''}`}
                 >
                   <span className="nav-icon">🛡️</span> 
-                  Admin Panel
+                  Πίνακας Ελέγχου
                 </NavLink>
               </>
             )}

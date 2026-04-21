@@ -26,7 +26,7 @@ export default function EditEventPage() {
 
   return (
     <div className="edit-event-page">
-      <h1>Edit Event</h1>
+      <h1 style={{ marginBottom: '20px' }}>Επεξεργασία Καταχώρησης</h1>
       <EventForm initial={event} onSubmit={handleSubmit} />
     </div>
   );

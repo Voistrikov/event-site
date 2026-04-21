@@ -19,8 +19,8 @@ export default function ManageEventsPage() {
   return (
     <div className="manage-events-page">
       <div className="profile-page-header">
-        <h1 className="profile-page-title" style={{ marginBottom: 8 }}>My Events</h1>
-        <Link to="/events/create" className="btn btn-primary btn-sm">Create Event</Link>
+        <h1 className="profile-page-title" style={{ marginBottom: 8 }}>Τα Ακίνητά μου</h1>
+        <Link to="/events/create" className="btn btn-primary btn-sm">Νέα Καταχώρηση</Link>
       </div>
       <EventTable events={events} onDelete={handleDelete} />
     </div>

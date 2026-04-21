@@ -13,7 +13,7 @@ export default function CreateEventPage() {
 
   return (
     <div className="create-event-page">
-      <h1>Create Event</h1>
+      <h1 style={{ marginBottom: '20px' }}>Νέα Καταχώρηση</h1>
       <EventForm onSubmit={handleSubmit} />
     </div>
   );
