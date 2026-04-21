@@ -13,7 +13,7 @@ export function useEvents(params?: Record<string, unknown>) {
       .then((res) => setEvents(res.data))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [JSON.stringify(params)]);
 
   return { events, loading, error };
 }

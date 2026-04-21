@@ -21,7 +21,7 @@ export default function EventsPage() {
           <p>Find your next stay from our selection of premium locations.</p>
         </div>
         
-        <EventFilters onFilter={setFilters} />
+        <EventFilters onFilter={(newFilter) => setFilters(prev => ({ ...prev, ...newFilter }))} />
         
         {loading ? (
           <LoadingSpinner />
