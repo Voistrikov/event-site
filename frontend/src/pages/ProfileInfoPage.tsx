@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { upgradeToOrganizer } from '../api/usersApi';
 import '../styles/ProfileInfoPage.css';
 
 export default function ProfileInfoPage() {
@@ -22,6 +23,18 @@ export default function ProfileInfoPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleUpgrade = async () => {
+    if (window.confirm('Είστε σίγουροι ότι θέλετε να γίνετε Οικοδεσπότης;')) {
+      try {
+        await upgradeToOrganizer();
+        alert('Συγχαρητήρια! Είστε πλέον Οικοδεσπότης.');
+        window.location.reload();
+      } catch (err) {
+        alert('Αποτυχία αναβάθμισης. Προσπαθήστε ξανά.');
+      }
+    }
+  };
+
   const handleEditClick = () => {
     setIsEditing(!isEditing);
   };
@@ -37,16 +50,23 @@ export default function ProfileInfoPage() {
     <div className="profile-info-container">
       <div className="profile-info-header">
         <h1 className="profile-info-title">το Προφίλ μου</h1>
-        {!isEditing ? (
-          <button className="edit-btn" onClick={handleEditClick}>
-            <span>✏️</span> Επεξεργασία
-          </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          {user?.role === 'ATTENDEE' && (
+            <button className="search-cta-btn" onClick={handleUpgrade} style={{ padding: '8px 16px', fontSize: '14px' }}>
+              <span>🏠</span> Γίνε Οικοδεσπότης
+            </button>
+          )}
+          {!isEditing ? (
+            <button className="edit-btn" onClick={handleEditClick}>
+              <span>✏️</span> Επεξεργασία
+            </button>
         ) : (
           <div className="save-actions">
             <button className="btn-cancel" onClick={() => setIsEditing(false)}>Ακύρωση</button>
             <button className="btn-save" onClick={handleSave}>Αποθήκευση</button>
           </div>
         )}
+        </div>
       </div>
 
       <div className="profile-content-grid">

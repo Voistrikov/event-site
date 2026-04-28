@@ -3,11 +3,13 @@ import { sendMessage } from '../../api/messagingApi';
 
 interface ComposeMessageProps {
   onSent?: () => void;
+  initialRecipientId?: string;
+  initialSubject?: string;
 }
 
-export default function ComposeMessage({ onSent }: ComposeMessageProps) {
-  const [recipientId, setRecipientId] = useState('');
-  const [subject, setSubject] = useState('');
+export default function ComposeMessage({ onSent, initialRecipientId = '', initialSubject = '' }: ComposeMessageProps) {
+  const [recipientId, setRecipientId] = useState(initialRecipientId);
+  const [subject, setSubject] = useState(initialSubject);
   const [body, setBody] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -54,6 +56,7 @@ export default function ComposeMessage({ onSent }: ComposeMessageProps) {
         <label>Μήνυμα</label>
         <textarea 
           className="form-textarea"
+          rows={4}
           value={body} 
           onChange={(e) => setBody(e.target.value)} 
           placeholder="Γράψτε το μήνυμά σας εδώ..." 
@@ -61,9 +64,29 @@ export default function ComposeMessage({ onSent }: ComposeMessageProps) {
         />
       </div>
 
-      <button type="submit" className="btn-send">
-        <span>✈️</span> Αποστολή
-      </button>
+      <div className="form-actions" style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+        <button type="submit" className="btn-send" style={{ flex: 1, justifyContent: 'center' }}>
+          <span>✈️</span> Αποστολή
+        </button>
+        {initialRecipientId && (
+          <button 
+            type="button" 
+            className="btn-cancel" 
+            onClick={() => onSent?.()} 
+            style={{ 
+              padding: '12px 24px', 
+              borderRadius: '8px', 
+              border: '1px solid #ddd', 
+              background: '#fff', 
+              color: '#666', 
+              cursor: 'pointer',
+              fontWeight: '600'
+            }}
+          >
+            Ακύρωση
+          </button>
+        )}
+      </div>
     </form>
   );
 }

@@ -37,6 +37,7 @@ enum BookingStatus {
   PENDING
   CONFIRMED
   CANCELLED
+  REJECTED
 }
 
 // ---------------------------------------------------------------------------
@@ -153,7 +154,9 @@ model Booking {
   ticketTypeId    String
   numberOfTickets Int
   totalCost       Decimal       @db.Decimal(10, 2)
-  status          BookingStatus @default(CONFIRMED)
+  status          BookingStatus @default(PENDING)
+  checkIn         DateTime
+  checkOut        DateTime
   createdAt       DateTime      @default(now())
 
   event      Event      @relation(fields: [eventId], references: [id])

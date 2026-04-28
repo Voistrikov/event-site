@@ -3,8 +3,12 @@ export interface Booking {
   eventId: string;
   userId: string;
   ticketTypeId: string;
-  quantity: number;
-  totalPrice: number;
-  status: 'confirmed' | 'cancelled';
+  numberOfTickets: number;
+  totalCost: number;
+  checkIn: string;
+  checkOut: string;
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'REJECTED';
   createdAt: string;
+  event?: any;
+  user?: any;
 }

@@ -106,6 +106,35 @@ export const getEvents = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
+export const getEventById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const event = await prisma.event.findUnique({
+      where: { id },
+      include: {
+        ticketTypes: true,
+        photos: true,
+        organizer: {
+          select: { id: true, firstName: true, lastName: true, avatarUrl: true }
+        },
+        bookings: {
+          where: { status: { in: ['CONFIRMED', 'PENDING'] } },
+          select: { checkIn: true, checkOut: true, status: true }
+        }
+      }
+    });
+
+    if (!event) {
+      res.status(404).json({ error: 'Event not found' });
+      return;
+    }
+
+    res.json(event);
+  } catch (error) {
+    next(error);
+  }
+};
+
 import { getRecommendations } from '../services/recommendation.service.js';
 
 export const getRecommendedEventsHandler = async (req: Request, res: Response, next: NextFunction) => {

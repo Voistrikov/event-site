@@ -147,8 +147,8 @@ async function main(): Promise<void> {
               id: `ticket-${prop.id}`,
               name: 'Nightly Rate',
               price: prop.id === 'prop-1-acropolis-view' ? 120.00 : prop.id === 'prop-2-plaka-studio' ? 65.00 : 150.00,
-              quantity: 1,
-              available: 1
+              quantity: prop.capacity,
+              available: prop.capacity
             }
           }
         }
@@ -171,7 +171,9 @@ async function main(): Promise<void> {
             ticketTypeId: ticket1.id,
             numberOfTickets: 1,
             totalCost: ticket1.price,
-            status: 'CONFIRMED'
+            status: 'PENDING',
+            checkIn: new Date(),
+            checkOut: new Date(new Date().setDate(new Date().getDate() + 2))
           }
         });
 
@@ -185,7 +187,9 @@ async function main(): Promise<void> {
             ticketTypeId: ticket2.id,
             numberOfTickets: 1,
             totalCost: ticket2.price,
-            status: 'CONFIRMED'
+            status: 'PENDING',
+            checkIn: new Date(),
+            checkOut: new Date(new Date().setDate(new Date().getDate() + 1))
           }
         });
       }

@@ -77,6 +77,13 @@ export default function ProfileLayout() {
                   <span className="nav-icon">🔑</span> 
                   Τα Ακίνητά μου
                 </NavLink>
+                <NavLink 
+                  to="/manage-bookings" 
+                  className={({ isActive }) => `profile-nav-link ${isActive ? 'active' : ''}`}
+                >
+                  <span className="nav-icon">📅</span> 
+                  Διαχείριση Κρατήσεων
+                </NavLink>
               </>
             )}
 

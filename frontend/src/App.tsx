@@ -20,6 +20,7 @@ import NotFoundPage       from './pages/NotFoundPage';
 import ProfileLayout    from './components/layout/ProfileLayout';
 import ProfileInfoPage from './pages/ProfileInfoPage';
 import EventDetailsPage from './pages/EventDetailsPage';
+import OrganizerBookingsPage from './pages/OrganizerBookingsPage';
 
 export default function App() {
   const { initialize } = useAuth();
@@ -76,6 +77,14 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}>
               <EditEventPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manage-bookings"
+          element={
+            <ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}>
+              <OrganizerBookingsPage />
             </ProtectedRoute>
           }
         />

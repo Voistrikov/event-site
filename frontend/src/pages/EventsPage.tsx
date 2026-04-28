@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useEvents } from '../hooks/useEvents';
 import EventCard from '../components/events/EventCard';
@@ -17,13 +17,16 @@ export default function EventsPage() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   
   // Combine filters with mapLocation for the backend
-  const activeFilters = { ...filters, page, limit: 9 };
-  if (mapLocation) {
-    (activeFilters as any).lat = mapLocation.lat;
-    (activeFilters as any).lng = mapLocation.lng;
-  }
+  const activeFilters = useMemo(() => {
+    const params = { ...filters, page, limit: 9 } as any;
+    if (mapLocation) {
+      params.lat = mapLocation.lat;
+      params.lng = mapLocation.lng;
+    }
+    return params;
+  }, [filters, page, mapLocation]);
   
-  const { events, loading, totalPages } = useEvents(activeFilters);
+  const { events, loading, totalPages, error } = useEvents(activeFilters);
 
   return (
     <div className="events-split-container">
@@ -47,6 +50,12 @@ export default function EventsPage() {
         </div>
         
         <EventFilters onFilter={(newFilter) => setFilters(prev => ({ ...prev, ...newFilter }))} />
+        
+        {error && (
+          <div style={{ color: '#e53935', padding: '20px', textAlign: 'center', background: '#ffebee', borderRadius: '8px', marginBottom: '20px' }}>
+            <strong>Σφάλμα:</strong> {error}
+          </div>
+        )}
         
         {loading ? (
           <LoadingSpinner />

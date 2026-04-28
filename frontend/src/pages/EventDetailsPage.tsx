@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { getEvent } from '../api/eventsApi';
+import { createBooking } from '../api/bookingsApi';
+import { useAuth } from '../hooks/useAuth';
 import type { Event } from '../types/event.types';
+import BookingCalendar from '../components/bookings/BookingCalendar';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import EventMap from '../components/events/EventMap';
 import { formatDate } from '../utils/dateFormat';
@@ -10,14 +13,27 @@ import '../styles/EventDetailsPage.css';
 export default function EventDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [bookingLoading, setBookingLoading] = useState(false);
+  
+  // Date selection state
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const dayAfterTomorrow = new Date();
+  dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+  
+  const [checkIn, setCheckIn] = useState(tomorrow.toISOString().split('T')[0]);
+  const [checkOut, setCheckOut] = useState(dayAfterTomorrow.toISOString().split('T')[0]);
+  const [guests, setGuests] = useState(1);
+  const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/public/events/${id}`);
+        const response = await getEvent(id);
         setEvent(response.data);
       } catch (err) {
         setError('Failed to fetch property details.');
@@ -27,6 +43,20 @@ export default function EventDetailsPage() {
     };
     if (id) fetchEvent();
   }, [id]);
+
+  useEffect(() => {
+    if (event?.ticketTypes?.[0]) {
+      const price = Number(event.ticketTypes[0].price);
+      const start = new Date(checkIn);
+      const end = new Date(checkOut);
+      if (end > start) {
+        const nights = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+        setTotalPrice(price * nights);
+      } else {
+        setTotalPrice(0);
+      }
+    }
+  }, [event, checkIn, checkOut]);
 
   if (loading) return <LoadingSpinner />;
   if (error || !event) return <div className="p-8 text-center text-red-500">{error || 'Property not found'}</div>;
@@ -119,17 +149,99 @@ export default function EventDetailsPage() {
             <div className="booking-price">
               {price} <span>/ night</span>
             </div>
+
+            <div className="booking-calendar-wrapper" style={{ margin: '16px 0' }}>
+              <BookingCalendar 
+                checkIn={checkIn} 
+                checkOut={checkOut} 
+                bookedRanges={event.bookings || []}
+                onDatesChange={(start, end) => {
+                  setCheckIn(start);
+                  setCheckOut(end);
+                }} 
+              />
+            </div>
+
+            <div className="booking-info-inputs" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
+              <div style={{ border: '1px solid #ddd', borderRadius: '8px', background: '#fff', padding: '10px' }}>
+                <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', color: '#666' }}>Nights</label>
+                <input 
+                  type="number" 
+                  min="1" 
+                  value={checkIn && checkOut ? Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)) : 1}
+                  onChange={(e) => {
+                    if (!checkIn) return;
+                    const val = parseInt(e.target.value) || 1;
+                    const newEnd = new Date(checkIn);
+                    newEnd.setDate(newEnd.getDate() + val);
+                    setCheckOut(newEnd.toISOString().split('T')[0]);
+                  }}
+                  style={{ border: 'none', width: '100%', fontSize: '14px', outline: 'none', background: 'transparent' }}
+                />
+              </div>
+              <div style={{ border: '1px solid #ddd', borderRadius: '8px', background: '#fff', padding: '10px' }}>
+                <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', color: '#666' }}>Guests</label>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max={event.capacity || 10} 
+                  value={guests} 
+                  onChange={(e) => setGuests(parseInt(e.target.value) || 1)}
+                  style={{ border: 'none', width: '100%', fontSize: '14px', outline: 'none', background: 'transparent' }}
+                />
+              </div>
+            </div>
+
+            {checkIn && checkOut && (
+              <div className="reservation-summary" style={{ background: '#e3f2fd', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.85rem', color: '#1b3858', border: '1px solid #bbdefb' }}>
+                <div><strong>Committed:</strong> {formatDate(checkIn)} to {formatDate(checkOut)}</div>
+                <div style={{ marginTop: '4px' }}><strong>Duration:</strong> {Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24))} days</div>
+              </div>
+            )}
             
             <button 
               className="booking-btn"
-              disabled={!isAvailable}
-              onClick={() => {
-                alert('Booking system will process this ticket type mock.');
-                // Here we would ideally navigate to a booking flow / checkout
+              disabled={!isAvailable || bookingLoading || totalPrice === 0}
+              onClick={async () => {
+                if (!user) {
+                  navigate('/login');
+                  return;
+                }
+                if (!event.ticketTypes?.[0]) return;
+                
+                try {
+                  setBookingLoading(true);
+                  await createBooking({
+                    eventId: event.id,
+                    ticketTypeId: event.ticketTypes[0].id,
+                    quantity: guests,
+                    checkIn,
+                    checkOut
+                  });
+                  navigate('/bookings');
+                } catch (err) {
+                  alert('Αποτυχία κράτησης. Δοκιμάστε ξανά.');
+                } finally {
+                  setBookingLoading(false);
+                }
               }}
             >
-              {isAvailable ? 'Book your stay' : 'Sold Out'}
+              {bookingLoading ? 'Processing...' : (isAvailable ? 'Book your stay' : 'Sold Out')}
             </button>
+            
+            {totalPrice > 0 && (
+              <div style={{ marginTop: '16px', borderTop: '1px solid #eee', paddingTop: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span>€{price} x {Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24))} nights</span>
+                  <span>€{totalPrice}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '18px', marginTop: '16px' }}>
+                  <span>Total</span>
+                  <span>€{totalPrice}</span>
+                </div>
+              </div>
+            )}
+            
             <p style={{ textAlign: 'center', marginTop: '16px', color: '#6b7280', fontSize: '14px' }}>
               You won't be charged yet
             </p>

@@ -8,7 +8,13 @@ import '../styles/MessagingPage.css';
 
 export default function MessagingPage() {
   const [tab, setTab] = useState<'inbox' | 'sent' | 'compose'>('inbox');
+  const [replyInfo, setReplyInfo] = useState<{ recipientId: string; subject: string } | null>(null);
   const { inbox, sent, loading, refresh } = useMessages();
+
+  const handleReply = (recipientId: string, subject: string) => {
+    setReplyInfo({ recipientId, subject });
+    setTab('compose');
+  };
 
   if (loading) return <LoadingSpinner />;
 
@@ -53,9 +59,19 @@ export default function MessagingPage() {
             </h2>
           </div>
           <div className="content-body">
-            {tab === 'inbox' && <MessageInbox messages={inbox} />}
+            {tab === 'inbox' && <MessageInbox messages={inbox} onReply={handleReply} />}
             {tab === 'sent' && <MessageSent messages={sent} />}
-            {tab === 'compose' && <ComposeMessage onSent={() => { refresh(); setTab('sent'); }} />}
+            {tab === 'compose' && (
+              <ComposeMessage 
+                initialRecipientId={replyInfo?.recipientId}
+                initialSubject={replyInfo?.subject}
+                onSent={() => { 
+                  refresh(); 
+                  setTab('sent'); 
+                  setReplyInfo(null);
+                }} 
+              />
+            )}
           </div>
         </main>
       </div>

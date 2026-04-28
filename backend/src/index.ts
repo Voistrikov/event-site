@@ -9,6 +9,9 @@ import { logger } from './config/logger.js';
 import { authRouter } from './routes/auth.routes.js';
 import { adminRouter } from './routes/admin.routes.js';
 import { eventRouter } from './routes/event.routes.js';
+import { bookingRouter } from './routes/booking.routes.js';
+import { userRouter } from './routes/user.routes.js';
+import messageRouter from './routes/message.routes.js';
 import { errorHandler } from './middleware/errorHandler.middleware.js';
 
 const app = express();
@@ -26,6 +29,9 @@ app.get('/health', (_req, res) => {
 app.use('/auth',  authRouter);
 app.use('/admin', adminRouter);
 app.use('/events', eventRouter);
+app.use('/bookings', bookingRouter);
+app.use('/users', userRouter);
+app.use('/messages', messageRouter);
 
 app.use(errorHandler);
 
