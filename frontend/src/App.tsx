@@ -16,6 +16,7 @@ import ManageEventsPage   from './pages/ManageEventsPage';
 import CreateEventPage    from './pages/CreateEventPage';
 import EditEventPage      from './pages/EditEventPage';
 import AdminPage          from './pages/AdminPage';
+import AdminUserDetailsPage from './pages/AdminUserDetailsPage';
 import NotFoundPage       from './pages/NotFoundPage';
 import ProfileLayout    from './components/layout/ProfileLayout';
 import ProfileInfoPage from './pages/ProfileInfoPage';
@@ -95,6 +96,14 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
               <AdminPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users/:id"
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <AdminUserDetailsPage />
             </ProtectedRoute>
           }
         />

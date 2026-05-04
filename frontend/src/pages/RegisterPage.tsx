@@ -12,28 +12,54 @@ const INITIAL: RegisterFormData = {
 export default function RegisterPage() {
   const [form, setForm]   = useState<RegisterFormData>(INITIAL);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const set = (field: keyof RegisterFormData) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       setForm((prev) => ({ ...prev, [field]: e.target.value }));
+      if (fieldErrors[field]) {
+        setFieldErrors((prev) => ({ ...prev, [field]: '' }));
+      }
+      setError(null);
+    };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setFieldErrors({});
     setLoading(true);
     try {
       await register(form);
-      navigate('/login', { replace: true });
+      navigate('/pending-approval', { replace: true });
     } catch (err: unknown) {
-      const msg =
-        (err as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-        'Registration failed. Please check your details and try again.';
-      setError(msg);
+      const data = (err as any)?.response?.data;
+      if (data) {
+        if (data.code === 'VALIDATION_ERROR' && data.details) {
+          const errors: Record<string, string> = {};
+          for (const key in data.details) {
+            errors[key] = data.details[key][0];
+          }
+          setFieldErrors(errors);
+        } else if (data.code === 'USERNAME_TAKEN') {
+          setFieldErrors({ username: data.error });
+        } else if (data.code === 'EMAIL_TAKEN') {
+          setFieldErrors({ email: data.error });
+        } else {
+          setError(data.error || 'Registration failed. Please try again.');
+        }
+      } else {
+        setError('Registration failed. Please check your details and try again.');
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const FieldError = ({ field }: { field: string }) => {
+    if (!fieldErrors[field]) return null;
+    return <div style={{ color: '#dc2626', fontSize: '0.85rem', marginBottom: '4px' }}>{fieldErrors[field]}</div>;
   };
 
   return (
@@ -54,8 +80,10 @@ export default function RegisterPage() {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label" htmlFor="username">Username</label>
-              <input id="username" className="form-input" value={form.username}
-                onChange={set('username')} placeholder="johndoe" required />
+              <FieldError field="username" />
+              <input id="username" className={`form-input ${fieldErrors.username ? 'input-error' : ''}`} value={form.username}
+                onChange={set('username')} placeholder="johndoe" 
+                minLength={3} maxLength={50} pattern="^\S+$" title="Χωρίς κενά, 3-50 χαρακτήρες" required />
             </div>
             <div className="form-group">
               <label className="form-label" htmlFor="role">I am an</label>
@@ -71,27 +99,32 @@ export default function RegisterPage() {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label" htmlFor="firstName">First Name</label>
-              <input id="firstName" className="form-input" value={form.firstName}
-                onChange={set('firstName')} placeholder="John" required />
+              <FieldError field="firstName" />
+              <input id="firstName" className={`form-input ${fieldErrors.firstName ? 'input-error' : ''}`} value={form.firstName}
+                onChange={set('firstName')} placeholder="John" minLength={1} maxLength={100} required />
             </div>
             <div className="form-group">
               <label className="form-label" htmlFor="lastName">Last Name</label>
-              <input id="lastName" className="form-input" value={form.lastName}
-                onChange={set('lastName')} placeholder="Doe" required />
+              <FieldError field="lastName" />
+              <input id="lastName" className={`form-input ${fieldErrors.lastName ? 'input-error' : ''}`} value={form.lastName}
+                onChange={set('lastName')} placeholder="Doe" minLength={1} maxLength={100} required />
             </div>
           </div>
 
           {/* Row 3 */}
           <div className="form-group">
             <label className="form-label" htmlFor="email">Email</label>
-            <input id="email" className="form-input" type="email" value={form.email}
+            <FieldError field="email" />
+            <input id="email" className={`form-input ${fieldErrors.email ? 'input-error' : ''}`} type="email" value={form.email}
               onChange={set('email')} placeholder="john@example.com" required />
           </div>
 
           <div className="form-group">
             <label className="form-label" htmlFor="reg-password">Password</label>
-            <input id="reg-password" className="form-input" type="password" value={form.password}
+            <FieldError field="password" />
+            <input id="reg-password" className={`form-input ${fieldErrors.password ? 'input-error' : ''}`} type="password" value={form.password}
               onChange={set('password')} placeholder="Min 8 chars, 1 uppercase, 1 digit"
+              minLength={8} pattern="^(?=.*[A-Z])(?=.*\d).+$" title="Τουλάχιστον 8 χαρακτήρες, 1 κεφαλαίο, 1 αριθμός"
               autoComplete="new-password" required />
           </div>
 
@@ -99,33 +132,38 @@ export default function RegisterPage() {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label" htmlFor="phone">Phone</label>
-              <input id="phone" className="form-input" type="tel" value={form.phone}
-                onChange={set('phone')} placeholder="+30 210 0000000" required />
+              <FieldError field="phone" />
+              <input id="phone" className={`form-input ${fieldErrors.phone ? 'input-error' : ''}`} type="tel" value={form.phone}
+                onChange={set('phone')} placeholder="+30 210 0000000" minLength={7} maxLength={20} required />
             </div>
             <div className="form-group">
               <label className="form-label" htmlFor="taxId">Tax ID (ΑΦΜ)</label>
-              <input id="taxId" className="form-input" value={form.taxId}
-                onChange={set('taxId')} placeholder="123456789" required />
+              <FieldError field="taxId" />
+              <input id="taxId" className={`form-input ${fieldErrors.taxId ? 'input-error' : ''}`} value={form.taxId}
+                onChange={set('taxId')} placeholder="123456789" minLength={1} maxLength={20} required />
             </div>
           </div>
 
           {/* Row 5 */}
           <div className="form-group">
             <label className="form-label" htmlFor="address">Address</label>
-            <input id="address" className="form-input" value={form.address}
-              onChange={set('address')} placeholder="123 Main St" required />
+            <FieldError field="address" />
+            <input id="address" className={`form-input ${fieldErrors.address ? 'input-error' : ''}`} value={form.address}
+              onChange={set('address')} placeholder="123 Main St" minLength={1} maxLength={200} required />
           </div>
 
           <div className="form-row">
             <div className="form-group">
               <label className="form-label" htmlFor="city">City</label>
-              <input id="city" className="form-input" value={form.city}
-                onChange={set('city')} placeholder="Athens" required />
+              <FieldError field="city" />
+              <input id="city" className={`form-input ${fieldErrors.city ? 'input-error' : ''}`} value={form.city}
+                onChange={set('city')} placeholder="Athens" minLength={1} maxLength={100} required />
             </div>
             <div className="form-group">
               <label className="form-label" htmlFor="country">Country Code</label>
-              <input id="country" className="form-input" value={form.country}
-                onChange={set('country')} placeholder="GR" maxLength={2} required />
+              <FieldError field="country" />
+              <input id="country" className={`form-input ${fieldErrors.country ? 'input-error' : ''}`} value={form.country}
+                onChange={set('country')} placeholder="GR" minLength={2} maxLength={100} required />
             </div>
           </div>
 
@@ -146,4 +184,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-

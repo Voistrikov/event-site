@@ -21,6 +21,18 @@ export function errorHandler(
   if (err != null && typeof err === 'object' && 'code' in err) {
     const code = (err as Record<string, unknown>)['code'];
     if (code === 'P2002') {
+      const meta = (err as Record<string, unknown>)['meta'];
+      const metaStr = JSON.stringify(meta || {});
+
+      if (metaStr.includes('username')) {
+        sendError(res, 409, 'user account exists', 'USERNAME_TAKEN');
+        return;
+      }
+      if (metaStr.includes('email')) {
+        sendError(res, 409, 'user account mail exists', 'EMAIL_TAKEN');
+        return;
+      }
+
       sendError(res, 409, 'A record with that value already exists.', 'CONFLICT');
       return;
     }

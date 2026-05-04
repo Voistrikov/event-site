@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { listUsers, updateUserStatus, exportEventsJson, exportEventsXml } from '../api/adminApi';
 import type { ListUsersResponse } from '../api/adminApi';
@@ -58,6 +58,11 @@ export default function AdminPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    load(1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterRole, filterStatus]);
 
   const handleStatusUpdate = async (user: User, status: 'APPROVED' | 'REJECTED') => {
     setActing(user.id);
@@ -138,19 +143,12 @@ export default function AdminPage() {
                 onClick={() => load(1)}
                 disabled={loading}
               >
-                {loading ? 'Φόρτωση…' : 'Φόρτωση Χρηστών'}
+                {loading ? 'Φόρτωση…' : '↻ Ανανέωση'}
               </button>
             </div>
           </div>
 
           {/* Table */}
-          {!result && !loading && (
-            <div className="empty-state">
-              <div className="empty-state-icon">👥</div>
-              <div className="empty-state-text">Press "Load Users" to fetch the user list</div>
-            </div>
-          )}
-
           {loading && <div className="spinner" />}
 
           {result && !loading && (
@@ -209,6 +207,9 @@ export default function AdminPage() {
                             {u.status === 'APPROVED' && u.role === 'ADMIN' && (
                               <span style={{ fontSize: 12, color: '#6b7280' }}>—</span>
                             )}
+                            <Link to={`/admin/users/${u.id}`} className="btn btn-secondary btn-sm">
+                              Προβολή
+                            </Link>
                           </div>
                         </td>
                       </tr>

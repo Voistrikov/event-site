@@ -25,8 +25,9 @@ export default function LoginPage() {
       } else {
         navigate('/home', { replace: true });
       }
-    } catch {
-      setError('Invalid username / email or password.');
+    } catch (err: unknown) {
+      const msg = (err as any)?.response?.data?.error || 'Invalid username / email or password.';
+      setError(msg);
     } finally {
       setLoading(false);
     }

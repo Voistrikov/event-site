@@ -99,3 +99,28 @@ export async function getAllEventsForExport() {
     }
   });
 }
+
+export async function getUserById(userId: string): Promise<UserResponseDto> {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: userId },
+    select: {
+      id: true,
+      username: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      phone: true,
+      address: true,
+      city: true,
+      country: true,
+      latitude: true,
+      longitude: true,
+      taxId: true,
+      role: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  return user as UserResponseDto;
+}

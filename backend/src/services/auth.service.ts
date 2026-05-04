@@ -128,6 +128,10 @@ export async function login(identifier: string, password: string): Promise<Login
     }
   }
 
+  if (user.status === 'REJECTED') {
+    throw new AuthError('Η αίτησή σας δεν έγινε δεκτή από τον διαχειριστή.', 'ACCOUNT_REJECTED', 403);
+  }
+
   const accessToken = signAccessToken({ sub: user.id, role: user.role as Role });
   const rawRefreshToken = generateRefreshToken();
 

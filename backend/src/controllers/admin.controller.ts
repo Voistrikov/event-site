@@ -43,6 +43,20 @@ export async function updateUserStatusHandler(
   }
 }
 
+export async function getUserHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const { id } = req.params as { id: string };
+    const user = await adminService.getUserById(id);
+    res.json({ user });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function exportEventsJsonHandler(
   req: Request,
   res: Response,
