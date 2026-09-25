@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import './App.css';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -9,7 +10,6 @@ import LoginPage          from './pages/LoginPage';
 import RegisterPage       from './pages/RegisterPage';
 import PendingApprovalPage from './pages/PendingApprovalPage';
 import EventsPage         from './pages/EventsPage';
-import HomePage           from './pages/HomePage';
 import BookingsPage       from './pages/BookingsPage';
 import MessagingPage      from './pages/MessagingPage';
 import ManageEventsPage   from './pages/ManageEventsPage';
@@ -18,7 +18,7 @@ import EditEventPage      from './pages/EditEventPage';
 import AdminPage          from './pages/AdminPage';
 import AdminUserDetailsPage from './pages/AdminUserDetailsPage';
 import NotFoundPage       from './pages/NotFoundPage';
-import ProfileLayout    from './components/layout/ProfileLayout';
+import EventsAppLayout from './components/layout/EventsAppLayout';
 import ProfileInfoPage from './pages/ProfileInfoPage';
 import EventDetailsPage from './pages/EventDetailsPage';
 import OrganizerBookingsPage from './pages/OrganizerBookingsPage';
@@ -39,22 +39,16 @@ export default function App() {
       <Route path="/login"             element={<LoginPage />} />
       <Route path="/register"          element={<RegisterPage />} />
       <Route path="/pending-approval"  element={<PendingApprovalPage />} />
-      <Route path="/events"            element={<EventsPage />} />
-      <Route path="/search"            element={<EventsPage />} />
+      <Route path="/events"            element={<Navigate to="/search" replace />} />
       <Route path="/events/:id"        element={<EventDetailsPage />} />
 
-      {/* ── Authenticated Dashboard Layout ──────────────────────────────── */}
-      <Route
-        element={
-          <ProtectedRoute>
-            <ProfileLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/home"           element={<HomePage />} />
-        <Route path="/profile/info"   element={<ProfileInfoPage />} />
-        <Route path="/bookings"       element={<BookingsPage />} />
-        <Route path="/messaging"      element={<MessagingPage />} />
+      {/* ── Shared events-style application shell ───────────────────────── */}
+      <Route element={<EventsAppLayout />}>
+        <Route path="/search" element={<EventsPage />} />
+        <Route path="/home" element={<ProtectedRoute><Navigate to="/search" replace /></ProtectedRoute>} />
+        <Route path="/profile/info" element={<ProtectedRoute><ProfileInfoPage /></ProtectedRoute>} />
+        <Route path="/bookings" element={<ProtectedRoute><BookingsPage /></ProtectedRoute>} />
+        <Route path="/messaging" element={<ProtectedRoute><MessagingPage /></ProtectedRoute>} />
 
         {/* ── Organizer ───────────────────────────────────────────────────── */}
         <Route

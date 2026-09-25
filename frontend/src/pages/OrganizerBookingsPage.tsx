@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { AxiosResponse } from 'axios';
-import { getOrganizerBookings, updateBookingStatus } from '../api/bookingsApi';
+import { getOrganizerBookings } from '../api/bookingsApi';
 import type { Booking } from '../types/booking.types';
 import OrganizerBookingList from '../components/bookings/OrganizerBookingList';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -11,7 +11,6 @@ export default function OrganizerBookingsPage() {
   const [loading, setLoading] = useState(true);
 
   const load = () => {
-    setLoading(true);
     getOrganizerBookings()
       .then((res: AxiosResponse<Booking[]>) => { 
         setBookings(res.data); 
@@ -27,31 +26,21 @@ export default function OrganizerBookingsPage() {
 
   useEffect(() => { load(); }, []);
 
-  const handleUpdateStatus = async (id: string, status: 'CONFIRMED' | 'REJECTED') => {
-    try {
-      await updateBookingStatus(id, status);
-      load();
-    } catch (err) {
-      console.error('Failed to update booking status', err);
-      alert('Αποτυχία ενημέρωσης κατάστασης.');
-    }
-  };
-
   if (loading) return <LoadingSpinner />;
 
   return (
     <div className="bookings-page-container">
       <div className="bookings-header">
-        <h1 className="bookings-title">Διαχείριση Κρατήσεων</h1>
+        <h1 className="bookings-title">Κρατήσεις Εκδηλώσεων</h1>
       </div>
 
       {bookings.length === 0 ? (
         <div className="bookings-empty-state">
-          <h2>Δεν υπάρχουν αιτήματα κράτησης</h2>
-          <p>Όταν κάποιος χρήστης ζητήσει να μείνει σε ένα από τα σπίτια σας, θα εμφανιστεί εδώ.</p>
+          <h2>Δεν υπάρχουν κρατήσεις</h2>
+          <p>Οι κρατήσεις για τις εκδηλώσεις σας θα εμφανιστούν εδώ.</p>
         </div>
       ) : (
-        <OrganizerBookingList bookings={bookings} onUpdateStatus={handleUpdateStatus} />
+        <OrganizerBookingList bookings={bookings} />
       )}
     </div>
   );

@@ -34,9 +34,9 @@ export default function HomePage() {
       <div className="dashboard-grid" style={{ marginBottom: '40px' }}>
         {/* Browse Events — visible to all */}
         <Link to="/events" className="dash-card">
-          <div className="dash-card-icon" style={{ background: '#e0e7ff' }}>🏠</div>
-          <div className="dash-card-title">Αναζήτηση Ακινήτων</div>
-          <div className="dash-card-desc">Ανακαλύψτε διαθέσιμα καταλύματα στην περιοχή σας</div>
+          <div className="dash-card-icon" style={{ background: '#e0e7ff' }}>🎭</div>
+          <div className="dash-card-title">Αναζήτηση Εκδηλώσεων</div>
+          <div className="dash-card-desc">Ανακαλύψτε εκδηλώσεις στην περιοχή σας</div>
         </Link>
 
         {/* My Bookings — all approved users */}
@@ -50,15 +50,15 @@ export default function HomePage() {
         <Link to="/messaging" className="dash-card">
           <div className="dash-card-icon" style={{ background: '#fef9c3' }}>💬</div>
           <div className="dash-card-title">Μηνύματα</div>
-          <div className="dash-card-desc">Επικοινωνία με ιδιοκτήτες ή πελάτες</div>
+          <div className="dash-card-desc">Επικοινωνία με διοργανωτές ή συμμετέχοντες</div>
         </Link>
 
         {/* Organizer tools */}
         {isOrganizer && (
           <Link to="/manage-events" className="dash-card">
-            <div className="dash-card-icon" style={{ background: '#ede9fe' }}>🔑</div>
-            <div className="dash-card-title">Τα Ακίνητά μου</div>
-            <div className="dash-card-desc">Διαχείριση και καταχώρηση νέων ακινήτων</div>
+            <div className="dash-card-icon" style={{ background: '#ede9fe' }}>🎟️</div>
+            <div className="dash-card-title">Οι Εκδηλώσεις μου</div>
+            <div className="dash-card-desc">Διαχείριση και δημιουργία νέων εκδηλώσεων</div>
           </Link>
         )}
 
@@ -75,8 +75,11 @@ export default function HomePage() {
       {/* Recommendations Section */}
       <div className="recommendations-section">
         <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#111827', marginBottom: '16px' }}>
-          ✨ Προτεινόμενα Ακίνητα (Αλγόριθμος Συστάσεων)
+          ✨ Προτεινόμενες Εκδηλώσεις (Αλγόριθμος Συστάσεων)
         </h2>
+        <p style={{ color: '#6b7280', margin: '-8px 0 16px' }}>
+          Βασισμένο στις κρατήσεις και τις εκδηλώσεις που έχετε επισκεφθεί
+        </p>
         {loading ? (
           <div className="spinner"></div>
         ) : recommendations.length > 0 ? (
@@ -92,4 +95,3 @@ export default function HomePage() {
     </div>
   );
 }
-

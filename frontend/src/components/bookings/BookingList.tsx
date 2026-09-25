@@ -3,12 +3,9 @@ import type { Booking } from '../../types/booking.types';
 import { formatDate } from '../../utils/dateFormat';
 import MessageModal from '../messages/MessageModal';
 
-interface BookingListProps {
-  bookings: Booking[];
-  onCancel?: (id: string) => void;
-}
+interface BookingListProps { bookings: Booking[]; }
 
-export default function BookingList({ bookings, onCancel }: BookingListProps) {
+export default function BookingList({ bookings }: BookingListProps) {
   const [activeMessage, setActiveMessage] = useState<{ recipientId: string; recipientName: string; subject: string } | null>(null);
 
   return (
@@ -29,28 +26,23 @@ export default function BookingList({ bookings, onCancel }: BookingListProps) {
             <span className="booking-date">{formatDate(b.createdAt)}</span>
           </div>
           <div className="booking-card-info" style={{ padding: '15px', borderBottom: '1px solid #f0f0f0', background: '#f8fbff' }}>
-            <h3 style={{ margin: '0 0 5px 0', fontSize: '1.1rem', color: '#1b3858' }}>{(b.event as any)?.title}</h3>
+            <h3 style={{ margin: '0 0 5px 0', fontSize: '1.1rem', color: '#1b3858' }}>{b.event?.title}</h3>
             <div style={{ fontSize: '0.85rem', color: '#666' }}>
-              📍 {(b.event as any)?.city}, {(b.event as any)?.country}
+              📅 {b.event?.startDateTime ? formatDate(b.event.startDateTime) : '—'} · 📍 {b.event?.city}, {b.event?.country}
             </div>
           </div>
           <div className="booking-card-body">
-            {/* ... existing details ... */}
             <div className="booking-detail">
-              <span className="booking-detail-label">Check-in</span>
-              <span className="booking-detail-value">{formatDate(b.checkIn)}</span>
+              <span className="booking-detail-label">Τύπος εισιτηρίου</span>
+              <span className="booking-detail-value">{b.ticketType?.name ?? '—'}</span>
             </div>
             <div className="booking-detail">
-              <span className="booking-detail-label">Check-out</span>
-              <span className="booking-detail-value">{formatDate(b.checkOut)}</span>
-            </div>
-            <div className="booking-detail">
-              <span className="booking-detail-label">Άτομα</span>
+              <span className="booking-detail-label">Εισιτήρια</span>
               <span className="booking-detail-value">{b.numberOfTickets}</span>
             </div>
             <div className="booking-detail">
               <span className="booking-detail-label">Σύνολο</span>
-              <span className="booking-detail-value">€{b.totalCost}</span>
+              <span className="booking-detail-value">€{Number(b.totalCost).toFixed(2)}</span>
             </div>
             <div className="booking-detail">
               <span className={`booking-status status-${b.status.toLowerCase()}`}>
@@ -61,14 +53,11 @@ export default function BookingList({ bookings, onCancel }: BookingListProps) {
             </div>
           </div>
           <div className="booking-actions" style={{ display: 'flex', gap: '10px' }}>
-            {onCancel && (b.status === 'CONFIRMED' || b.status === 'PENDING') && (
-              <button className="btn-cancel-booking" onClick={() => onCancel(b.id)} style={{ flex: 1 }}>Ακύρωση</button>
-            )}
             <button 
               onClick={() => setActiveMessage({
-                recipientId: (b.event as any)?.organizer?.id,
-                recipientName: (b.event as any)?.organizer?.firstName || 'Ιδιοκτήτη',
-                subject: `Ερώτηση για την κράτηση στο ${(b.event as any)?.title}`
+                recipientId: b.event?.organizer?.id ?? '',
+                recipientName: b.event?.organizer?.firstName || 'Διοργανωτή',
+                subject: `Ερώτηση για την κράτηση στην εκδήλωση ${b.event?.title}`
               })}
               className="btn-contact-owner"
               style={{ 
@@ -84,7 +73,7 @@ export default function BookingList({ bookings, onCancel }: BookingListProps) {
                 cursor: 'pointer'
               }}
             >
-              Επικοινωνία με Ιδιοκτήτη
+              Επικοινωνία με Διοργανωτή
             </button>
           </div>
         </li>

@@ -25,8 +25,11 @@ function HomePage() {
       {/* Recommendations Section */}
       <div style={{ textAlign: 'left', maxWidth: '1200px', margin: '0 auto' }}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '20px' }}>
-          ✨ Προτεινόμενα Ακίνητα (Αλγόριθμος Συστάσεων)
+          ✨ Προτεινόμενες Εκδηλώσεις (Αλγόριθμος Συστάσεων)
         </h2>
+        <p style={{ color: '#6b7280', margin: '-12px 0 20px' }}>
+          Βασισμένο στις κρατήσεις και τις εκδηλώσεις που έχετε επισκεφθεί
+        </p>
         {loading ? (
           <div>Φόρτωση προτάσεων...</div>
         ) : recommendations.length > 0 ? (

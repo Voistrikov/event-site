@@ -24,12 +24,12 @@ export default function ProfileInfoPage() {
   };
 
   const handleUpgrade = async () => {
-    if (window.confirm('Είστε σίγουροι ότι θέλετε να γίνετε Οικοδεσπότης;')) {
+    if (window.confirm('Είστε σίγουροι ότι θέλετε να γίνετε Διοργανωτής;')) {
       try {
         await upgradeToOrganizer();
-        alert('Συγχαρητήρια! Είστε πλέον Οικοδεσπότης.');
+        alert('Συγχαρητήρια! Είστε πλέον Διοργανωτής.');
         window.location.reload();
-      } catch (err) {
+      } catch {
         alert('Αποτυχία αναβάθμισης. Προσπαθήστε ξανά.');
       }
     }
@@ -53,7 +53,7 @@ export default function ProfileInfoPage() {
         <div style={{ display: 'flex', gap: '12px' }}>
           {user?.role === 'ATTENDEE' && (
             <button className="search-cta-btn" onClick={handleUpgrade} style={{ padding: '8px 16px', fontSize: '14px' }}>
-              <span>🏠</span> Γίνε Οικοδεσπότης
+              <span>🎟️</span> Γίνε Διοργανωτής
             </button>
           )}
           {!isEditing ? (

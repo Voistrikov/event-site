@@ -12,6 +12,7 @@ import { eventRouter } from './routes/event.routes.js';
 import { bookingRouter } from './routes/booking.routes.js';
 import { userRouter } from './routes/user.routes.js';
 import messageRouter from './routes/message.routes.js';
+import { categoryRouter } from './routes/category.routes.js';
 import { errorHandler } from './middleware/errorHandler.middleware.js';
 
 const app = express();
@@ -32,6 +33,7 @@ app.use('/events', eventRouter);
 app.use('/bookings', bookingRouter);
 app.use('/users', userRouter);
 app.use('/messages', messageRouter);
+app.use('/categories', categoryRouter);
 
 app.use(errorHandler);
 
@@ -40,4 +42,3 @@ app.listen(env.PORT, () => {
 });
 
 export default app;
-

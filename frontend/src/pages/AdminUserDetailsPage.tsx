@@ -34,7 +34,7 @@ export default function AdminUserDetailsPage() {
         if (isMounted) {
           setUser(res.data.user);
         }
-      } catch (err) {
+      } catch {
         if (isMounted) setError('Failed to load user details.');
       } finally {
         if (isMounted) setLoading(false);

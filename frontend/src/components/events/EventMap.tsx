@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
 interface EventMapProps {
   latitude: number;
@@ -13,20 +15,18 @@ export default function EventMap({ latitude, longitude, title }: EventMapProps) 
   useEffect(() => {
     if (!mapRef.current) return;
 
-    import('leaflet').then((L) => {
-      const map = L.map(mapRef.current!).setView([latitude, longitude], 13);
+    const map = L.map(mapRef.current).setView([latitude, longitude], 13);
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-      }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(map);
 
-      L.marker([latitude, longitude])
-        .addTo(map)
-        .bindPopup(title ?? 'Event Location')
-        .openPopup();
+    L.marker([latitude, longitude])
+      .addTo(map)
+      .bindPopup(title ?? 'Event Location')
+      .openPopup();
 
-      return () => { map.remove(); };
-    });
+    return () => { map.remove(); };
   }, [latitude, longitude, title]);
 
   return <div ref={mapRef} style={{ height: '400px', width: '100%' }} />;

@@ -1,7 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
-
 .welcome-layout {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-family);
   height: 100vh;
   width: 100%;
   display: flex;
@@ -23,24 +21,22 @@
   flex-direction: column;
   align-items: center;
   text-decoration: none;
-  color: #2F4858;
+  color: #fff;
 }
 
 .welcome-logo h2 {
-  font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: 1.5rem;
+  font-size: 2rem;
   margin: 0;
   letter-spacing: 2px;
-  color: #1b3858;
+  color: #fff;
 }
 
 .welcome-logo p {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 0.8rem;
+  font-style: normal;
+  font-size: 1rem;
   margin: 0;
-  color: #1b3858;
+  color: #fff;
 }
 
 .welcome-nav-links {
@@ -92,13 +88,13 @@
 }
 
 .hero-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 4.5rem;
+  font-size: 5.25rem;
   font-weight: 400;
-  color: #a57866;
+  color: #fff;
   line-height: 1.1;
   margin-bottom: 2rem;
   text-align: left;
+  text-shadow: 2px 3px 8px rgba(0, 0, 0, 0.4);
 }
 
 .hero-buttons {
@@ -122,12 +118,18 @@
 }
 
 .hero-btn-outline {
-  background-color: rgba(255, 255, 255, 0.4);
-  color: #b5816c;
-  border: 1px solid #b5816c;
+  background-color: rgba(0, 0, 0, 0.28);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(2px);
 }
 
 .hero-btn-outline:hover {
-  background-color: rgba(255,255,255,0.7);
+  background-color: rgba(0, 0, 0, 0.45);
+}
+
+@media (max-width: 680px) {
+  .welcome-logo h2 { font-size: 1.65rem; }
+  .welcome-logo p { font-size: 0.85rem; }
+  .hero-title { font-size: 3.5rem; }
 }

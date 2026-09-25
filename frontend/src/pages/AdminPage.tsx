@@ -86,7 +86,7 @@ export default function AdminPage() {
       document.body.appendChild(link);
       link.click();
       link.parentNode?.removeChild(link);
-    } catch (err) {
+    } catch {
       setError(`Failed to export ${format.toUpperCase()}`);
     }
   };
@@ -249,4 +249,3 @@ export default function AdminPage() {
     </div>
   );
 }
-

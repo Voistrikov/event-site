@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { AxiosResponse } from 'axios';
-import { getEvent, updateEvent } from '../api/eventsApi';
-import type { Event } from '../types/event.types';
+import { getEvent, publishEvent, updateEvent } from '../api/eventsApi';
+import type { Event, EventFormData } from '../types/event.types';
 import EventForm from '../components/events/EventForm';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
@@ -15,9 +15,10 @@ export default function EditEventPage() {
     if (id) getEvent(id).then((res: AxiosResponse<Event>) => setEvent(res.data));
   }, [id]);
 
-  const handleSubmit = async (data: Partial<Event>) => {
+  const handleSubmit = async (data: EventFormData, publishAfterSave: boolean) => {
     if (id) {
       await updateEvent(id, data);
+      if (publishAfterSave) await publishEvent(id);
       navigate('/manage-events');
     }
   };
@@ -26,8 +27,8 @@ export default function EditEventPage() {
 
   return (
     <div className="edit-event-page">
-      <h1 style={{ marginBottom: '20px' }}>Επεξεργασία Καταχώρησης</h1>
-      <EventForm initial={event} onSubmit={handleSubmit} />
+      <h1 style={{ marginBottom: '20px' }}>Επεξεργασία Εκδήλωσης</h1>
+      <EventForm initial={event} onSubmit={handleSubmit} submitLabel="Αποθήκευση Αλλαγών" />
     </div>
   );
 }

@@ -229,3 +229,4 @@
   font-weight: 500;
   font-size: 0.95rem;
 }
+.delete-btn { margin: 10px 0 0 8px; padding: 5px 10px; border: 1px solid #fecaca; border-radius: 5px; background: #fff; color: #b91c1c; cursor: pointer; }

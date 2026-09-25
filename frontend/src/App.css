@@ -182,3 +182,27 @@
     border-right-color: var(--border);
   }
 }
+/* Event create/edit form */
+.event-form { display: grid; gap: 24px; max-width: 980px; }
+.event-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.form-field { display: grid; gap: 7px; color: #334155; font-weight: 650; }
+.form-field-wide { grid-column: 1 / -1; }
+.form-field input, .form-field textarea, .form-field select, .ticket-type-row input { padding: 11px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; font-weight: 400; }
+.category-picker { display: flex; flex-wrap: wrap; gap: 12px 20px; padding: 18px; border: 1px solid #cbd5e1; border-radius: 10px; }
+.category-picker legend { padding: 0 7px; font-weight: 700; }
+.event-form-map { height: 280px; overflow: hidden; border-radius: 10px; border: 1px solid #cbd5e1; }
+.ticket-types-section { padding: 20px; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; }
+.section-heading-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.section-heading-row h3 { margin: 0; }
+.ticket-type-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-top: 12px; }
+.capacity-summary { margin-top: 16px; color: #475569; }
+.error-text { color: #b91c1c; }
+.event-form-submit { justify-self: start; padding: 12px 20px; border: 0; border-radius: 8px; color: #fff; background: #1b3858; font-weight: 700; cursor: pointer; }
+.event-form-submit:disabled { opacity: .55; cursor: not-allowed; }
+.event-form-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.event-form-publish { background: #087f5b; }
+.event-table-status { display: inline-flex; padding: 4px 8px; border-radius: 999px; background: #e2e8f0; color: #334155; font-size: 12px; font-weight: 750; }
+.event-table-status.status-published { background: #dcfce7; color: #166534; }
+.event-table-status.status-cancelled { background: #fee2e2; color: #991b1b; }
+.event-table-status.status-completed { background: #f3f4f6; color: #4b5563; }
+@media (max-width: 680px) { .event-form-grid { grid-template-columns: 1fr; } .form-field-wide { grid-column: auto; } .ticket-type-row { grid-template-columns: 1fr; } }

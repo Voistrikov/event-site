@@ -22,7 +22,7 @@ export default function MessageModal({ recipientId, recipientName, subject, onCl
       await sendMessage({ recipientId, subject, body });
       setSuccess(true);
       setTimeout(() => onClose(), 2000);
-    } catch (err) {
+    } catch {
       alert('Αποτυχία αποστολής μηνύματος.');
     } finally {
       setLoading(false);

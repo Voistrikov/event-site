@@ -1,10 +1,24 @@
+import { useEffect, useState } from 'react';
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { getUnreadCount } from '../../api/messagesApi';
 import './ProfileLayout.css';
 
 export default function ProfileLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const loadUnread = () => getUnreadCount().then(({ data }) => setUnreadCount(data.unreadCount)).catch(() => undefined);
+    void loadUnread();
+    const interval = window.setInterval(loadUnread, 30_000);
+    window.addEventListener('messages-updated', loadUnread);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener('messages-updated', loadUnread);
+    };
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -19,8 +33,8 @@ export default function ProfileLayout() {
       {/* Top Header */}
       <header className="profile-header">
         <Link to="/" className="profile-brand">
-          <div className="profile-brand-icon" style={{ backgroundColor: '#1b3858', color: 'white', fontWeight: 'bold' }}>B</div>
-          <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, letterSpacing: '1px', color: '#1b3858' }}>BOOKING PLACE</span>
+          <div className="profile-brand-icon" style={{ backgroundColor: '#1b3858', color: 'white', fontWeight: 'bold' }}>E</div>
+          <span className="brand-name" style={{ color: '#1b3858' }}>EventHub</span>
         </Link>
         <div className="profile-header-actions">
           <span className="profile-user-greeting">
@@ -63,26 +77,26 @@ export default function ProfileLayout() {
               className={({ isActive }) => `profile-nav-link ${isActive ? 'active' : ''}`}
             >
               <span className="nav-icon">💬</span> 
-              Μηνύματα
+              Μηνύματα {unreadCount > 0 && <span className="unread-badge" aria-label={`${unreadCount} νέα μηνύματα`}>{unreadCount > 99 ? '99+' : unreadCount}</span>}
             </NavLink>
 
             {isOrganizer && (
               <>
                 <div className="nav-divider"></div>
-                <div className="nav-group-title">Ιδιοκτήτης</div>
+                <div className="nav-group-title">Διοργανωτής</div>
                 <NavLink 
                   to="/manage-events" 
                   className={({ isActive }) => `profile-nav-link ${isActive ? 'active' : ''}`}
                 >
                   <span className="nav-icon">🔑</span> 
-                  Τα Ακίνητά μου
+                  Οι Εκδηλώσεις μου
                 </NavLink>
                 <NavLink 
                   to="/manage-bookings" 
                   className={({ isActive }) => `profile-nav-link ${isActive ? 'active' : ''}`}
                 >
                   <span className="nav-icon">📅</span> 
-                  Διαχείριση Κρατήσεων
+                  Κρατήσεις Εκδηλώσεων
                 </NavLink>
               </>
             )}

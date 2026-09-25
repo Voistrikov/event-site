@@ -1,12 +1,8 @@
 import axiosInstance from './axiosInstance';
+import type { CreateBookingPayload } from '../types/booking.types';
 
 export const getBookings = () => axiosInstance.get('/bookings');
 export const getOrganizerBookings = () => axiosInstance.get('/bookings/organizer');
 
-export const createBooking = (data: { eventId: string; ticketTypeId: string; quantity: number; checkIn: string; checkOut: string }) =>
+export const createBooking = (data: CreateBookingPayload) =>
   axiosInstance.post('/bookings', data);
-
-export const updateBookingStatus = (id: string, status: 'CONFIRMED' | 'REJECTED') => 
-  axiosInstance.patch(`/bookings/${id}/status`, { status });
-
-export const cancelBooking = (id: string) => axiosInstance.delete(`/bookings/${id}`);

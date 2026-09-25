@@ -5,11 +5,10 @@ import type { Event } from '../types/event.types';
 export function useEvents(params?: Record<string, unknown>) {
   const [events, setEvents] = useState<Event[]>([]);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
     getEvents(params)
       .then((res) => {
         // Backend returns either an array (legacy) or { events, totalPages }
@@ -23,7 +22,7 @@ export function useEvents(params?: Record<string, unknown>) {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [JSON.stringify(params)]);
+  }, [params]);
 
   return { events, loading, error, totalPages };
 }

@@ -1,12 +1,9 @@
 import type { Booking } from '../../types/booking.types';
 import { formatDate } from '../../utils/dateFormat';
 
-interface OrganizerBookingListProps {
-  bookings: Booking[];
-  onUpdateStatus: (id: string, status: 'CONFIRMED' | 'REJECTED') => void;
-}
+interface OrganizerBookingListProps { bookings: Booking[]; }
 
-export default function OrganizerBookingList({ bookings, onUpdateStatus }: OrganizerBookingListProps) {
+export default function OrganizerBookingList({ bookings }: OrganizerBookingListProps) {
   return (
     <ul className="booking-list">
       {bookings.map((b) => (
@@ -17,24 +14,24 @@ export default function OrganizerBookingList({ bookings, onUpdateStatus }: Organ
           </div>
           <div className="booking-card-body">
             <div className="booking-detail">
-              <span className="booking-detail-label">Κατάλυμα</span>
-              <span className="booking-detail-value">{(b.event as any).title}</span>
+              <span className="booking-detail-label">Εκδήλωση</span>
+              <span className="booking-detail-value">{b.event?.title}</span>
             </div>
             <div className="booking-detail">
               <span className="booking-detail-label">Επισκέπτης</span>
-              <span className="booking-detail-value">{(b.user as any).firstName} {(b.user as any).lastName}</span>
+              <span className="booking-detail-value">{b.user?.firstName} {b.user?.lastName}</span>
             </div>
             <div className="booking-detail">
-              <span className="booking-detail-label">Check-in</span>
-              <span className="booking-detail-value">{formatDate(b.checkIn)}</span>
+              <span className="booking-detail-label">Τύπος εισιτηρίου</span>
+              <span className="booking-detail-value">{b.ticketType?.name ?? '—'}</span>
             </div>
             <div className="booking-detail">
-              <span className="booking-detail-label">Check-out</span>
-              <span className="booking-detail-value">{formatDate(b.checkOut)}</span>
+              <span className="booking-detail-label">Εισιτήρια</span>
+              <span className="booking-detail-value">{b.numberOfTickets}</span>
             </div>
             <div className="booking-detail">
               <span className="booking-detail-label">Σύνολο</span>
-              <span className="booking-detail-value">€{b.totalCost}</span>
+              <span className="booking-detail-value">€{Number(b.totalCost).toFixed(2)}</span>
             </div>
             <div className="booking-detail">
               <span className={`booking-status status-${b.status.toLowerCase()}`}>
@@ -45,24 +42,6 @@ export default function OrganizerBookingList({ bookings, onUpdateStatus }: Organ
             </div>
           </div>
           
-          {b.status === 'PENDING' && (
-            <div className="booking-actions" style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
-              <button 
-                className="search-cta-btn" 
-                style={{ background: '#4caf50', flex: 1 }}
-                onClick={() => onUpdateStatus(b.id, 'CONFIRMED')}
-              >
-                Επιβεβαίωση
-              </button>
-              <button 
-                className="btn-cancel-booking" 
-                style={{ margin: 0, flex: 1 }}
-                onClick={() => onUpdateStatus(b.id, 'REJECTED')}
-              >
-                Απόρριψη
-              </button>
-            </div>
-          )}
         </li>
       ))}
     </ul>

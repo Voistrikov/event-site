@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useAuthStore } from '../store/authStore';
+import axios from 'axios';
+import heroImage from '../assets/hero.jpg';
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState('');
@@ -26,7 +28,8 @@ export default function LoginPage() {
         navigate('/home', { replace: true });
       }
     } catch (err: unknown) {
-      const msg = (err as any)?.response?.data?.error || 'Invalid username / email or password.';
+      const data = axios.isAxiosError<{ error?: string }>(err) ? err.response?.data : undefined;
+      const msg = data?.error || 'Λάθος όνομα χρήστη / email ή κωδικός πρόσβασης.';
       setError(msg);
     } finally {
       setLoading(false);
@@ -35,34 +38,39 @@ export default function LoginPage() {
 
   return (
     <div className="auth-wrapper">
-      <div className="auth-card">
-        <Link to="/" className="auth-logo" style={{ textDecoration: 'none' }}>
-          <div className="auth-logo-icon" style={{ backgroundColor: '#1b3858', color: 'white', fontWeight: 'bold' }}>B</div>
-          <span className="auth-logo-text" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, letterSpacing: '1px', color: '#1b3858' }}>BOOKING PLACE</span>
-        </Link>
+      <div className="auth-visual" aria-hidden="true">
+        <img src={heroImage} alt="" />
+      </div>
 
-        <h1 className="auth-title">Welcome back</h1>
-        <p className="auth-subtitle">Sign in to your account to continue</p>
+      <div className="auth-panel">
+        <div className="auth-card">
+          <Link to="/" className="auth-brand">
+            <h2 className="brand-name">EventHub</h2>
+            <p className="brand-tagline">Ανακαλύψτε Εκδηλώσεις</p>
+          </Link>
 
-        {error && <div className="alert alert-error" style={{ marginBottom: 16 }}>{error}</div>}
+          <h1 className="auth-title">Καλώς ήρθατε</h1>
+          <p className="auth-subtitle">Συνδεθείτε στον λογαριασμό σας για να συνεχίσετε</p>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
+          {error && <div className="alert alert-error" style={{ marginBottom: 16 }}>{error}</div>}
+
+          <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label" htmlFor="identifier">Username or Email</label>
+            <label className="form-label" htmlFor="identifier">Όνομα χρήστη ή Email</label>
             <input
               id="identifier"
               className="form-input"
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="username or email@example.com"
+              placeholder="όνομα χρήστη ή email@example.com"
               autoComplete="username"
               required
             />
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="password">Password</label>
+            <label className="form-label" htmlFor="password">Κωδικός πρόσβασης</label>
             <input
               id="password"
               className="form-input"
@@ -77,19 +85,19 @@ export default function LoginPage() {
 
           <div className="form-actions" style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
             <Link to="/" className="btn btn-lg" style={{ flex: 1, textAlign: 'center', backgroundColor: '#e2e8f0', color: '#334155' }}>
-              Cancel
+              Ακύρωση
             </Link>
             <button className="btn btn-primary btn-lg" type="submit" disabled={loading} style={{ flex: 2 }}>
-              {loading ? 'Signing in…' : 'Sign In'}
+              {loading ? 'Σύνδεση…' : 'Σύνδεση'}
             </button>
           </div>
-        </form>
+          </form>
 
-        <p className="auth-footer">
-          Don't have an account? <Link to="/register">Create one</Link>
-        </p>
+          <p className="auth-footer">
+            Δεν έχετε λογαριασμό; <Link to="/register">Δημιουργήστε έναν</Link>
+          </p>
+        </div>
       </div>
     </div>
   );
 }
-

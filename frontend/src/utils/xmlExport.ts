@@ -5,7 +5,7 @@ export function exportUsersToXml(users: User[]): string {
     .map(
       (u) =>
         `  <user id="${u.id}">
-    <name>${escapeXml(u.name)}</name>
+    <name>${escapeXml(`${u.firstName} ${u.lastName}`)}</name>
     <email>${escapeXml(u.email)}</email>
     <role>${u.role}</role>
     <status>${u.status}</status>

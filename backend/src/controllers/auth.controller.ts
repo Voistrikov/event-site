@@ -27,7 +27,7 @@ const registerSchema = z.object({
   taxId: z.string().min(1).max(20),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
-  role: z.enum(['ATTENDEE', 'ORGANIZER', 'ADMIN']),
+  role: z.enum(['ATTENDEE', 'ORGANIZER']),
 });
 
 const loginSchema = z.object({

@@ -16,17 +16,14 @@ export default function WelcomePage() {
       {/* Top Navbar specifically for Welcome Page */}
       <nav className="welcome-navbar">
         <Link to="/" className="welcome-logo">
-          <h2>BOOKING PLACE</h2>
-          <p>Experience Unforgettable Journeys</p>
+          <h2 className="brand-name">EventHub</h2>
+          <p className="brand-tagline">Ανακαλύψτε Εκδηλώσεις</p>
         </Link>
 
-        {/* Links requested: αναζήτηση σπιτιού, διαχειριστής, πελάτης + Login field right */}
         <div className="welcome-nav-links">
-          <Link to="/search">Αναζήτηση σπιτιού</Link>
+          <Link to="/search">Αναζήτηση εκδηλώσεων</Link>
           {!user ? (
             <>
-              <Link to="/login">Διαχειριστής</Link>
-              <Link to="/login">Πελάτης</Link>
               <Link to="/login" className="login-btn">Σύνδεση</Link>
             </>
           ) : (
@@ -43,11 +40,11 @@ export default function WelcomePage() {
       {/* Hero Content */}
       <div className="hero-content">
         <h1 className="hero-title">
-          Book Your Stay<br />With Ease
+          Κλείστε Εισιτήρια<br />Εύκολα
         </h1>
         <div className="hero-buttons">
-          <Link to="/login" className="hero-btn">PLACE YOUR HOME</Link>
-          <Link to="/search" className="hero-btn hero-btn-outline">BOOK YOUR STAY</Link>
+          <Link to={user ? '/events/create' : '/login'} className="hero-btn">ΔΗΜΙΟΥΡΓΗΣΤΕ ΕΚΔΗΛΩΣΗ</Link>
+          <Link to="/search" className="hero-btn hero-btn-outline">ΒΡΕΙΤΕ ΕΚΔΗΛΩΣΗ</Link>
         </div>
       </div>
     </div>

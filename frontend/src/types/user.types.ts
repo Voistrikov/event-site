@@ -14,6 +14,8 @@ export interface User {
   latitude: number | null;
   longitude: number | null;
   taxId: string;
+  role: Role;
+  status: UserStatus;
   avatarUrl: string | null;
   createdAt: string;
   updatedAt: string;
@@ -40,4 +42,3 @@ export interface LoginFormData {
   identifier: string;
   password: string;
 }
-

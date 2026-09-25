@@ -3,9 +3,10 @@ import { formatDateTime } from '../../utils/dateFormat';
 
 interface MessageSentProps {
   messages: Message[];
+  onDelete?: (id: string) => void;
 }
 
-export default function MessageSent({ messages }: MessageSentProps) {
+export default function MessageSent({ messages, onDelete }: MessageSentProps) {
   if (messages.length === 0) {
     return <p style={{ color: '#888', textAlign: 'center', marginTop: '20px' }}>Δεν υπάρχουν απεσταλμένα μηνύματα.</p>;
   }
@@ -19,6 +20,7 @@ export default function MessageSent({ messages }: MessageSentProps) {
             <span className="message-date">{formatDateTime(m.createdAt)}</span>
           </div>
           <p className="message-body">{m.body}</p>
+          {onDelete && <button className="delete-btn" onClick={() => onDelete(m.id)}>🗑️ Διαγραφή</button>}
         </li>
       ))}
     </ul>

@@ -70,6 +70,7 @@ model User {
   bookings        Booking[]
   sentMessages    Message[]      @relation("SentMessages")
   receivedMessages Message[]     @relation("ReceivedMessages")
+  eventViews      EventView[]
 
   @@map("users")
 }
@@ -118,6 +119,7 @@ model Event {
   ticketTypes TicketType[]
   bookings    Booking[]
   photos      EventPhoto[]
+  views       EventView[]
 
   @@map("events")
 }
@@ -154,9 +156,7 @@ model Booking {
   ticketTypeId    String
   numberOfTickets Int
   totalCost       Decimal       @db.Decimal(10, 2)
-  status          BookingStatus @default(PENDING)
-  checkIn         DateTime
-  checkOut        DateTime
+  status          BookingStatus @default(CONFIRMED)
   createdAt       DateTime      @default(now())
 
   event      Event      @relation(fields: [eventId], references: [id])
@@ -164,6 +164,19 @@ model Booking {
   ticketType TicketType @relation(fields: [ticketTypeId], references: [id])
 
   @@map("bookings")
+}
+
+model EventView {
+  id       String   @id @default(cuid())
+  userId   String
+  eventId  String
+  viewedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([userId, eventId, viewedAt])
+  @@map("event_views")
 }
 
 model Message {

@@ -4,9 +4,11 @@ import { formatDateTime } from '../../utils/dateFormat';
 interface MessageInboxProps {
   messages: Message[];
   onReply?: (recipientId: string, subject: string) => void;
+  onDelete?: (id: string) => void;
+  onRead?: (id: string) => void;
 }
 
-export default function MessageInbox({ messages, onReply }: MessageInboxProps) {
+export default function MessageInbox({ messages, onReply, onDelete, onRead }: MessageInboxProps) {
   if (messages.length === 0) {
     return <p style={{ color: '#888', textAlign: 'center', marginTop: '20px' }}>Δεν υπάρχουν εισερχόμενα μηνύματα.</p>;
   }
@@ -14,7 +16,7 @@ export default function MessageInbox({ messages, onReply }: MessageInboxProps) {
   return (
     <ul className="message-list">
       {messages.map((m) => (
-        <li key={m.id} className={`message-item ${m.read ? 'read' : 'unread'}`}>
+        <li key={m.id} className={`message-item ${m.read ? 'read' : 'unread'}`} onClick={() => !m.read && onRead?.(m.id)}>
           <div className="message-header">
             <span className="message-subject">{m.subject || '(Χωρίς Θέμα)'}</span>
             <span className="message-date">{formatDateTime(m.createdAt)}</span>
@@ -38,6 +40,7 @@ export default function MessageInbox({ messages, onReply }: MessageInboxProps) {
               Απάντηση
             </button>
           )}
+          {onDelete && <button className="delete-btn" onClick={(event) => { event.stopPropagation(); onDelete(m.id); }}>🗑️ Διαγραφή</button>}
         </li>
       ))}
     </ul>
