@@ -22,6 +22,7 @@ interface DbUser {
   latitude: number | null;
   longitude: number | null;
   taxId: string;
+  avatarUrl: string | null;
   role: Role;
   status: UserStatus;
   createdAt: Date;
@@ -42,6 +43,7 @@ function toUserResponse(user: DbUser): UserResponseDto {
     latitude: user.latitude,
     longitude: user.longitude,
     taxId: user.taxId,
+    avatarUrl: user.avatarUrl,
     role: user.role,
     status: user.status,
     createdAt: user.createdAt,

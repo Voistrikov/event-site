@@ -36,7 +36,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
-      - ./uploads:/app/uploads
+      - ./backend/uploads:/app/uploads
     ports:
       - "3000:3000"
     healthcheck:

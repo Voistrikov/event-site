@@ -18,14 +18,21 @@ export default function MessageInbox({ messages, onReply, onDelete, onRead }: Me
       {messages.map((m) => (
         <li key={m.id} className={`message-item ${m.read ? 'read' : 'unread'}`} onClick={() => !m.read && onRead?.(m.id)}>
           <div className="message-header">
-            <span className="message-subject">{m.subject || '(Χωρίς Θέμα)'}</span>
+            <div>
+              <span className="message-subject">{m.subject || '(Χωρίς Θέμα)'}</span>
+              {m.sender && (
+                <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '3px' }}>
+                  Από: <strong>{m.sender.username ? `@${m.sender.username}` : `${m.sender.firstName ?? ''} ${m.sender.lastName ?? ''}`}</strong>
+                </div>
+              )}
+            </div>
             <span className="message-date">{formatDateTime(m.createdAt)}</span>
           </div>
           <p className="message-body">{m.body}</p>
           {onReply && (
             <button 
               className="btn-message-reply"
-              onClick={() => onReply(m.senderId, `Re: ${m.subject}`)}
+              onClick={() => onReply(m.sender?.username || m.senderId, `Re: ${m.subject}`)}
               style={{ 
                 marginTop: '10px', 
                 padding: '5px 12px', 

@@ -7,6 +7,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { createBooking } from '../../api/bookingsApi';
 import TicketSelector from '../bookings/TicketSelector';
 import '../../styles/EventDetailsModal.css';
+import { fileUrl } from '../../utils/imageUrl';
 
 interface EventDetailsModalProps { event: Event; onClose: () => void; }
 
@@ -14,8 +15,7 @@ export default function EventDetailsModal({ event, onClose }: EventDetailsModalP
   const { user } = useAuth();
   const navigate = useNavigate();
   const [bookingLoading, setBookingLoading] = useState(false);
-  const fallbackImage = 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1200&q=80';
-  const imageUrl = event.photos?.[0] ? `http://localhost:3000/uploads/${event.photos[0].filename}` : fallbackImage;
+  const imageUrl = fileUrl(event.photos?.[0]?.filename);
   const bookable = event.status === 'PUBLISHED' && new Date(event.startDateTime) > new Date();
 
   const handleBook = async (ticketTypeId: string, numberOfTickets: number) => {
@@ -39,7 +39,7 @@ export default function EventDetailsModal({ event, onClose }: EventDetailsModalP
           <h2 id="event-modal-title" className="event-modal-title">{event.title}</h2>
           <div className="event-modal-meta"><span>{eventTypeLabel(event.eventType)}</span><span>📅 {formatDateTime(event.startDateTime)}</span><span>📍 {event.venue}, {event.city}</span></div>
         </header>
-        <div className="event-modal-photos"><img src={imageUrl} alt={event.title} className="modal-photo-main" /></div>
+        <div className="event-modal-photos">{imageUrl ? <img src={imageUrl} alt={event.title} className="modal-photo-main" /> : <div className="modal-photo-main modal-photo-main--empty" aria-label="Δεν υπάρχει φωτογραφία" />}</div>
         <div className="event-modal-body">
           <section className="event-modal-description">
             <h3>Σχετικά με την εκδήλωση</h3><p>{event.description}</p>

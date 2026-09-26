@@ -1,15 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { Category, Event, EventFormData, EventType } from '../../types/event.types';
+import type { Category, Event, EventFormData, EventPhoto, EventType } from '../../types/event.types';
 import { EVENT_TYPES } from '../../types/event.types';
 import MultiEventMap from './MultiEventMap';
 import { getCategories } from '../../api/eventsApi';
+import { fileUrl } from '../../utils/imageUrl';
+import '../../styles/EventForm.css';
 
 interface EventFormProps {
   initial?: Partial<Event>;
-  onSubmit: (data: EventFormData, publishAfterSave: boolean) => Promise<void> | void;
+  onSubmit: (data: EventFormData, publishAfterSave: boolean, photoChanges: PhotoChanges) => Promise<void> | void;
   submitLabel?: string;
   onCancel?: () => void;
 }
+
+export interface PhotoChanges { files: File[]; removePhotoIds: string[]; mainPhotoId?: string; mainNewIndex?: number; }
 
 const FALLBACK_CATEGORIES = ['Μουσική', 'Τέχνες', 'Εκπαίδευση', 'Τεχνολογία', 'Αθλητισμός', 'Πολιτισμός'];
 const toLocalDateTime = (value?: string | Date) => {
@@ -41,6 +45,10 @@ export default function EventForm({ initial = {}, onSubmit, submitLabel = 'Απ�
   const [ticketTypes, setTicketTypes] = useState<Array<{ id?: string; name: string; price: number; quantity: number }>>((initial.ticketTypes ?? []).map((ticket) => ({ id: ticket.id, name: ticket.name, price: Number(ticket.price), quantity: ticket.quantity })));
   const [submitting, setSubmitting] = useState(false);
   const [publishAfterSave, setPublishAfterSave] = useState(false);
+  const [existingPhotos, setExistingPhotos] = useState<EventPhoto[]>(initial.photos ?? []);
+  const [newPhotos, setNewPhotos] = useState<File[]>([]);
+  const [removedPhotoIds, setRemovedPhotoIds] = useState<string[]>([]);
+  const [mainSelection, setMainSelection] = useState<string>(() => (initial.photos ?? []).find((photo) => photo.isMain)?.id ?? initial.photos?.[0]?.id ?? '');
   const totalTickets = useMemo(() => ticketTypes.reduce((sum, ticket) => sum + (Number(ticket.quantity) || 0), 0), [ticketTypes]);
 
   useEffect(() => {
@@ -57,7 +65,9 @@ export default function EventForm({ initial = {}, onSubmit, submitLabel = 'Απ�
     if (!form.eventType || categories.length === 0 || ticketTypes.length === 0 || totalTickets > form.capacity) return;
     setSubmitting(true);
     try {
-      await onSubmit({ ...form, eventType: form.eventType, categories, ticketTypes: ticketTypes.map((ticket) => ({ ...ticket, price: Number(ticket.price), quantity: Number(ticket.quantity) })) }, publishAfterSave);
+      const mainExisting = existingPhotos.find((photo) => photo.id === mainSelection);
+      const mainNewIndex = newPhotos.findIndex((_, index) => `new-${index}` === mainSelection);
+      await onSubmit({ ...form, eventType: form.eventType, categories, ticketTypes: ticketTypes.map((ticket) => ({ ...ticket, price: Number(ticket.price), quantity: Number(ticket.quantity) })) }, publishAfterSave, { files: newPhotos, removePhotoIds: removedPhotoIds, ...(mainExisting ? { mainPhotoId: mainExisting.id } : {}), ...(mainNewIndex >= 0 ? { mainNewIndex } : {}) });
     } finally { setSubmitting(false); }
   };
 
@@ -85,6 +95,21 @@ export default function EventForm({ initial = {}, onSubmit, submitLabel = 'Απ�
         {ticketTypes.map((ticket, index) => <div key={ticket.id ?? index} className="ticket-type-row"><input aria-label="Ονομασία εισιτηρίου" placeholder="Ονομασία (π.χ. Κανονικό)" value={ticket.name} onChange={(e) => updateTicket(index, 'name', e.target.value)} required /><input aria-label="Τιμή εισιτηρίου" type="number" placeholder="Τιμή (€)" value={ticket.price} min="0" step="0.01" onChange={(e) => updateTicket(index, 'price', Number(e.target.value))} required /><input aria-label="Ποσότητα εισιτηρίων" type="number" placeholder="Ποσότητα" value={ticket.quantity} min="1" onChange={(e) => updateTicket(index, 'quantity', Number(e.target.value))} required /><button type="button" aria-label="Αφαίρεση τύπου εισιτηρίου" onClick={() => setTicketTypes((current) => current.filter((_, ticketIndex) => ticketIndex !== index))}>✕</button></div>)}
         {ticketTypes.length === 0 && <p className="error-text">Προσθέστε τουλάχιστον έναν τύπο εισιτηρίου.</p>}
         <div className={totalTickets > form.capacity ? 'capacity-summary error-text' : 'capacity-summary'}>Σύνολο εισιτηρίων: {totalTickets} / {form.capacity} χωρητικότητα {totalTickets > form.capacity && <strong> — ⚠️ Υπέρβαση χωρητικότητας!</strong>}</div>
+      </section>
+      <section className="ticket-types-section">
+        <div className="section-heading-row"><h3>Φωτογραφίες (προαιρετικά, έως 3)</h3></div>
+        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={(event) => {
+          const incoming = Array.from(event.target.files ?? []);
+          const available = 3 - existingPhotos.length - newPhotos.length;
+          if (incoming.some((file) => !['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type) || file.size > 5 * 1024 * 1024)) { alert('Επιλέξτε εικόνες JPEG, PNG, WebP ή GIF έως 5 MB.'); return; }
+          if (incoming.length > available) { alert('Μπορείτε να έχετε έως 3 φωτογραφίες.'); return; }
+          setNewPhotos((current) => [...current, ...incoming]);
+          event.target.value = '';
+        }} disabled={existingPhotos.length + newPhotos.length >= 3} />
+        <div className="photo-upload-grid">
+          {existingPhotos.map((photo) => <div className="photo-upload-item" key={photo.id}><img src={fileUrl(photo.filename) ?? ''} alt="Φωτογραφία εκδήλωσης" /><label><input type="radio" name="main-photo" checked={mainSelection === photo.id} onChange={() => setMainSelection(photo.id)} /> Κύρια</label><button type="button" onClick={() => { setExistingPhotos((current) => current.filter((item) => item.id !== photo.id)); setRemovedPhotoIds((current) => [...current, photo.id]); if (mainSelection === photo.id) setMainSelection(''); }}>✕</button></div>)}
+          {newPhotos.map((file, index) => <div className="photo-upload-item" key={`${file.name}-${index}`}><img src={URL.createObjectURL(file)} alt="Νέα φωτογραφία" /><label><input type="radio" name="main-photo" checked={mainSelection === `new-${index}`} onChange={() => setMainSelection(`new-${index}`)} /> Κύρια</label><button type="button" onClick={() => { setNewPhotos((current) => current.filter((_, itemIndex) => itemIndex !== index)); if (mainSelection === `new-${index}`) setMainSelection(''); }}>✕</button></div>)}
+        </div>
       </section>
       <div className="event-form-actions">
         <button className="event-form-submit" type="submit" onClick={() => setPublishAfterSave(false)} disabled={submitting || !form.eventType || categories.length === 0 || ticketTypes.length === 0 || totalTickets === 0 || totalTickets > form.capacity}>{submitting && !publishAfterSave ? 'Αποθήκευση...' : submitLabel}</button>

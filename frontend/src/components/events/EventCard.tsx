@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Event } from '../../types/event.types';
 import { eventTypeLabel } from '../../types/event.types';
 import { formatDate } from '../../utils/dateFormat';
+import { fileUrl } from '../../utils/imageUrl';
 
 interface EventCardProps {
   event: Event;
@@ -10,10 +11,7 @@ interface EventCardProps {
 
 export default function EventCard({ event, onViewDetails }: EventCardProps) {
   const navigate = useNavigate();
-  const defaultImage = 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=800&q=80';
-  const imageUrl = event.photos && event.photos.length > 0 
-    ? `http://localhost:3000/uploads/${event.photos[0].filename}` 
-    : defaultImage;
+  const imageUrl = fileUrl(event.photos?.[0]?.filename);
     
   const statusLabels = { DRAFT: 'ΠΡΟΣΧΕΔΙΟ', PUBLISHED: 'ΔΗΜΟΣΙΕΥΜΕΝΗ', COMPLETED: 'ΟΛΟΚΛΗΡΩΜΕΝΗ', CANCELLED: 'ΑΚΥΡΩΜΕΝΗ' };
   const minPrice = event.ticketTypes?.length ? Math.min(...event.ticketTypes.map((ticket) => Number(ticket.price))) : null;
@@ -22,7 +20,7 @@ export default function EventCard({ event, onViewDetails }: EventCardProps) {
   return (
     <div className="modern-event-card">
       <div className="event-card-image-wrapper">
-        <img src={imageUrl} alt={event.title} className="event-card-image" />
+        {imageUrl ? <img src={imageUrl} alt={event.title} className="event-card-image" /> : <div className="event-card-image event-card-image--empty" aria-label="Δεν υπάρχει φωτογραφία" />}
         <span className="event-card-tag tag-red">{statusLabels[event.status]}</span>
         <span className="event-card-type">{eventTypeLabel(event.eventType)}</span>
       </div>

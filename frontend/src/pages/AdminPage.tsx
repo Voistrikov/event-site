@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { listUsers, updateUserStatus, exportEventsJson, exportEventsXml } from '../api/adminApi';
 import type { ListUsersResponse } from '../api/adminApi';
 import type { User, Role, UserStatus } from '../types/user.types';
+import Button from '../components/common/Button';
 import '../styles/AdminPage.css';
 
 const ROLE_OPTIONS:   Array<{ label: string; value: Role | '' }>       = [
@@ -141,13 +142,12 @@ export default function AdminPage() {
                 ))}
               </select>
 
-              <button
-                className="btn btn-primary btn-sm"
+              <Button
                 onClick={() => load(1)}
                 disabled={loading}
               >
                 {loading ? 'Φόρτωση…' : '↻ Ανανέωση'}
-              </button>
+              </Button>
             </div>
           </div>
 

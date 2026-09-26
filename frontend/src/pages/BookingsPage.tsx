@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import type { AxiosResponse } from 'axios';
 import { getBookings } from '../api/bookingsApi';
 import type { Booking } from '../types/booking.types';
 import BookingList from '../components/bookings/BookingList';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import Button from '../components/common/Button';
 import '../styles/BookingsPage.css';
 
 interface EventOption {
@@ -137,9 +137,9 @@ export default function BookingsPage() {
     <div className="bookings-page-container">
       <div className="bookings-header">
         <h1 className="bookings-title">Οι Κρατήσεις μου</h1>
-        <Link to="/events" className="search-cta-btn">
+        <Button to="/events">
           <span>🔍</span> Αναζήτηση Εκδηλώσεων
-        </Link>
+        </Button>
       </div>
 
       {bookings.length > 0 && (

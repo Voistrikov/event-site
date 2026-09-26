@@ -1,0 +1,100 @@
+/* Non-vivid orange color variables */
+:root {
+  --orange-muted: #c8652e;
+  --orange-muted-hover: #b05422;
+  --orange-muted-active: #9a461a;
+  --orange-muted-focus: rgba(200, 101, 46, 0.28);
+}
+
+/* Base button styling ensuring consistent sizing across <button> and <Link> */
+.btn-orange {
+  background-color: var(--orange-muted, #c8652e);
+  color: #ffffff !important;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none !important;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease, opacity 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.btn-orange:hover:not(:disabled):not(.disabled) {
+  background-color: var(--orange-muted-hover, #b05422);
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
+
+.btn-orange:active:not(:disabled):not(.disabled) {
+  background-color: var(--orange-muted-active, #9a461a);
+  transform: scale(0.98);
+}
+
+.btn-orange:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--orange-muted-focus);
+}
+
+.btn-orange:disabled,
+.btn-orange.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Ensure link elements and buttons using .btn-sm have identical sizing */
+a.btn.btn-sm,
+button.btn.btn-sm,
+span.btn.btn-sm {
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  border-radius: 8px;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+a.btn-orange,
+a.btn-orange:hover,
+a.btn-orange:focus,
+a.btn-orange:visited {
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
+
+/* Save and Cancel button color variants */
+.btn-save {
+  background-color: #2ecc71;
+  color: #ffffff !important;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-save:hover:not(:disabled):not(.disabled) {
+  background-color: #27ae60;
+  color: #ffffff !important;
+}
+
+.btn-save:active:not(:disabled):not(.disabled) {
+  background-color: #219653;
+  transform: scale(0.98);
+}
+
+.btn-cancel {
+  background-color: #95a5a6;
+  color: #ffffff !important;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-cancel:hover:not(:disabled):not(.disabled) {
+  background-color: #7f8c8d;
+  color: #ffffff !important;
+}
+
+.btn-cancel:active:not(:disabled):not(.disabled) {
+  background-color: #707b7c;
+  transform: scale(0.98);
+}

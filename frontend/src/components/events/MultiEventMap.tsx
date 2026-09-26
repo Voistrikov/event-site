@@ -6,6 +6,7 @@ import L from 'leaflet';
 import type { Map as LeafletMap, Marker, LeafletMouseEvent } from 'leaflet';
 import { eventTypeLabel } from '../../types/event.types';
 import { formatDate } from '../../utils/dateFormat';
+import { fileUrl } from '../../utils/imageUrl';
 
 interface MultiEventMapProps {
   events: Event[];
@@ -92,14 +93,11 @@ export default function MultiEventMap({ events, onViewDetails, mapLocation, onMa
 
           const minPrice = event.ticketTypes?.length ? Math.min(...event.ticketTypes.map((ticket) => Number(ticket.price))) : null;
           const price = minPrice == null ? 'Χωρίς εισιτήρια' : minPrice === 0 ? 'Δωρεάν' : `Από €${minPrice.toFixed(2)}`;
-          const defaultImage = 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=800&q=80';
-          const imageUrl = event.photos && event.photos.length > 0 
-            ? `http://localhost:3000/uploads/${event.photos[0].filename}` 
-            : defaultImage;
+          const imageUrl = fileUrl(event.photos?.[0]?.filename);
 
           const popupContent = `
             <div class="map-popup-card" id="popup-${event.id}">
-              <img src="${imageUrl}" alt="${event.title}" />
+              ${imageUrl ? `<img src="${imageUrl}" alt="${event.title}" />` : '<div class="map-popup-image-empty" aria-label="Δεν υπάρχει φωτογραφία"></div>'}
               <div class="map-popup-content">
                 <h4>${event.title}</h4>
                 <p>${eventTypeLabel(event.eventType)}</p>

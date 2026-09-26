@@ -40,6 +40,7 @@ export interface UserResponseDto {
   latitude: number | null;
   longitude: number | null;
   taxId: string;
+  avatarUrl: string | null;
   role: Role;
   status: UserStatus;
   createdAt: Date;

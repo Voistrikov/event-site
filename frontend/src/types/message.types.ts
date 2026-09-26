@@ -1,3 +1,12 @@
+export interface MessageUser {
+  id?: string;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string | null;
+  email?: string;
+}
+
 export interface Message {
   id: string;
   senderId: string;
@@ -6,4 +15,7 @@ export interface Message {
   body: string;
   read: boolean;
   createdAt: string;
+  sender?: MessageUser;
+  recipient?: MessageUser;
 }
+

@@ -1,21 +1,21 @@
 .profile-info-container {
-  padding: 20px;
-  max-width: 1000px;
-  margin: 0 auto;
+  width: 75%;
+  margin: 36px auto 48px auto;
 }
 
 .profile-info-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
 }
 
 .profile-info-title {
-  font-size: 2.2rem;
-  color: #88c9e8;
+  font-size: 26px;
   font-weight: 700;
+  color: #1b3858;
   margin: 0;
+  line-height: 1.25;
 }
 
 .edit-btn {
@@ -167,27 +167,44 @@
 
 .save-actions {
   display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 20px;
+  gap: 8px;
+  align-items: center;
 }
 
 .btn-save {
   background-color: #2ecc71;
   color: white;
-  border: none;
-  padding: 10px 25px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
+}
+
+.btn-save:hover:not(:disabled) {
+  background-color: #27ae60;
 }
 
 .btn-cancel {
   background-color: #95a5a6;
   color: white;
-  border: none;
-  padding: 10px 25px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background-color: #7f8c8d;
+}
+
+@media (max-width: 900px) {
+  .profile-info-container {
+    width: 90%;
+    margin-top: 24px;
+    margin-bottom: 36px;
+  }
+
+  .profile-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .profile-info-container {
+    width: 95%;
+    margin-top: 16px;
+    margin-bottom: 24px;
+  }
 }

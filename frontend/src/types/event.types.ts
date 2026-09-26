@@ -26,7 +26,7 @@ export interface TicketType {
   available: number;
 }
 
-export interface EventPhoto { id: string; filename: string; }
+export interface EventPhoto { id: string; filename: string; isMain?: boolean; sortOrder?: number; }
 
 export interface Event {
   id: string;

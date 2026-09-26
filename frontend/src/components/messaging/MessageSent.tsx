@@ -16,7 +16,14 @@ export default function MessageSent({ messages, onDelete }: MessageSentProps) {
       {messages.map((m) => (
         <li key={m.id} className="message-item read">
           <div className="message-header">
-            <span className="message-subject">{m.subject || '(Χωρίς Θέμα)'}</span>
+            <div>
+              <span className="message-subject">{m.subject || '(Χωρίς Θέμα)'}</span>
+              {m.recipient && (
+                <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '3px' }}>
+                  Προς: <strong>{m.recipient.username ? `@${m.recipient.username}` : `${m.recipient.firstName ?? ''} ${m.recipient.lastName ?? ''}`}</strong>
+                </div>
+              )}
+            </div>
             <span className="message-date">{formatDateTime(m.createdAt)}</span>
           </div>
           <p className="message-body">{m.body}</p>

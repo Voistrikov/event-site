@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { upgradeToOrganizer } from '../api/usersApi';
+import { upgradeToOrganizer, uploadAvatar } from '../api/usersApi';
+import { fileUrl } from '../utils/imageUrl';
+import Button from '../components/common/Button';
 import '../styles/ProfileInfoPage.css';
 
 export default function ProfileInfoPage() {
-  const { user } = useAuth();
+  const { user, fetchMe } = useAuth();
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
@@ -46,10 +49,27 @@ export default function ProfileInfoPage() {
     alert('Το προφίλ ενημερώθηκε επιτυχώς (προσομοίωση)');
   };
 
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      alert('Επιλέξτε εικόνα JPEG, PNG, WebP ή GIF έως 5 MB.');
+      return;
+    }
+    try {
+      setAvatarUploading(true);
+      await uploadAvatar(file);
+      await fetchMe();
+    } catch {
+      alert('Η μεταφόρτωση της φωτογραφίας απέτυχε. Προσπαθήστε ξανά.');
+    } finally { setAvatarUploading(false); }
+  };
+
   return (
     <div className="profile-info-container">
       <div className="profile-info-header">
-        <h1 className="profile-info-title">το Προφίλ μου</h1>
+        <h1 className="profile-info-title">Το προφίλ μου</h1>
         <div style={{ display: 'flex', gap: '12px' }}>
           {user?.role === 'ATTENDEE' && (
             <button className="search-cta-btn" onClick={handleUpgrade} style={{ padding: '8px 16px', fontSize: '14px' }}>
@@ -57,13 +77,13 @@ export default function ProfileInfoPage() {
             </button>
           )}
           {!isEditing ? (
-            <button className="edit-btn" onClick={handleEditClick}>
+            <Button onClick={handleEditClick}>
               <span>✏️</span> Επεξεργασία
-            </button>
-        ) : (
+            </Button>
+          ) : (
           <div className="save-actions">
-            <button className="btn-cancel" onClick={() => setIsEditing(false)}>Ακύρωση</button>
-            <button className="btn-save" onClick={handleSave}>Αποθήκευση</button>
+            <Button variant="cancel" onClick={() => setIsEditing(false)}>Ακύρωση</Button>
+            <Button variant="save" onClick={handleSave}>Αποθήκευση</Button>
           </div>
         )}
         </div>
@@ -74,16 +94,16 @@ export default function ProfileInfoPage() {
         <div className="photo-section">
           <div className="section-label">Φωτογραφία</div>
           <div className="profile-image-container">
-            {user?.avatarUrl ? (
-              <img src={user.avatarUrl} alt="Profile" />
+            {fileUrl(user?.avatarUrl) ? (
+              <img src={fileUrl(user?.avatarUrl) ?? ''} alt="Profile" />
             ) : (
               <div className="avatar-placeholder">👤</div>
             )}
           </div>
           <div className="upload-overlay">
             <label className="upload-label">
-              <span>📷 Αλλαγή φωτογραφίας</span>
-              <input type="file" style={{ display: 'none' }} accept="image/*" />
+              <span>{avatarUploading ? 'Μεταφόρτωση...' : '📷 Αλλαγή φωτογραφίας'}</span>
+              <input type="file" style={{ display: 'none' }} accept="image/jpeg,image/png,image/webp,image/gif" disabled={avatarUploading} onChange={handleAvatarChange} />
             </label>
           </div>
         </div>

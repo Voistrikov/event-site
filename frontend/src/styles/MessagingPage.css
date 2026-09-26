@@ -3,8 +3,8 @@
 }
 
 .messaging-page-container {
-  padding: 20px;
-  max-width: 1200px;
+  padding: 24px 0 48px;
+  width: 60%;
   margin: 0 auto;
   min-height: calc(100vh - 100px);
 }
@@ -14,10 +14,11 @@
 }
 
 .messaging-title {
-  font-size: 2.2rem;
-  color: #88c9e8;
+  font-size: 26px;
   font-weight: 700;
+  color: #1b3858;
   margin: 0;
+  line-height: 1.25;
 }
 
 .messaging-layout {
@@ -161,10 +162,11 @@
   flex-direction: column;
   gap: 20px;
   background: white;
-  padding: 20px;
+  padding: 24px 28px;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  max-width: 600px;
+  width: 100%;
+  max-width: 850px;
   margin: 0 auto;
 }
 
@@ -230,3 +232,22 @@
   font-size: 0.95rem;
 }
 .delete-btn { margin: 10px 0 0 8px; padding: 5px 10px; border: 1px solid #fecaca; border-radius: 5px; background: #fff; color: #b91c1c; cursor: pointer; }
+
+@media (max-width: 1200px) {
+  .messaging-page-container {
+    width: 80%;
+  }
+}
+
+@media (max-width: 900px) {
+  .messaging-page-container {
+    width: 90%;
+  }
+}
+
+@media (max-width: 600px) {
+  .messaging-page-container {
+    width: 95%;
+  }
+}
+

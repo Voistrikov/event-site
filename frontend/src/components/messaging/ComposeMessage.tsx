@@ -15,14 +15,16 @@ export default function ComposeMessage({ onSent, initialRecipientId = '', initia
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     try {
       await sendMessage({ recipientId, subject, body });
       setRecipientId('');
       setSubject('');
       setBody('');
       onSent?.();
-    } catch {
-      setError('Αποτυχία αποστολής μηνύματος.');
+    } catch (err: unknown) {
+      const serverError = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      setError(serverError || 'Αποτυχία αποστολής μηνύματος.');
     }
   };
 
@@ -31,12 +33,12 @@ export default function ComposeMessage({ onSent, initialRecipientId = '', initia
       {error && <div className="error-message">{error}</div>}
       
       <div className="form-group">
-        <label>ID Παραλήπτη</label>
+        <label>Παραλήπτης (Username ή ID)</label>
         <input 
           className="form-input"
           value={recipientId} 
           onChange={(e) => setRecipientId(e.target.value)} 
-          placeholder="Εισάγετε το ID του παραλήπτη" 
+          placeholder="π.χ. organizer ή admin ή ID χρήστη" 
           required 
         />
       </div>

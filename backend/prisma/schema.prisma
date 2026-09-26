@@ -197,9 +197,11 @@ model Message {
 }
 
 model EventPhoto {
-  id       String @id @default(cuid())
-  eventId  String
-  filename String
+  id        String  @id @default(cuid())
+  eventId   String
+  filename  String
+  isMain    Boolean @default(false)
+  sortOrder Int     @default(0)
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 

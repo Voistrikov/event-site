@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import path from 'node:path';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -17,11 +18,12 @@ import { errorHandler } from './middleware/errorHandler.middleware.js';
 
 const app = express();
 
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });

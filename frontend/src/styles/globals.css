@@ -21,6 +21,9 @@
   --warning-bg:    #fffbeb;
   --danger:        #ef4444;
   --danger-bg:     #fef2f2;
+  --orange-muted:        #c8652e;
+  --orange-muted-hover:  #b05422;
+  --orange-muted-active: #9a461a;
   --radius:        10px;
   --shadow:        0 4px 6px -1px rgba(0,0,0,.08), 0 2px 4px -2px rgba(0,0,0,.05);
   --shadow-lg:     0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.05);
@@ -83,6 +86,10 @@ a:hover { text-decoration: underline; }
 
 .btn-outline  { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
 .btn-outline:hover:not(:disabled) { background: var(--primary-light); }
+
+.btn-orange   { background: var(--orange-muted); color: #fff; }
+.btn-orange:hover:not(:disabled) { background: var(--orange-muted-hover); }
+.btn-orange:active:not(:disabled) { background: var(--orange-muted-active); }
 
 .btn-sm { padding: 5px 12px; font-size: 13px; }
 .btn-lg { padding: 12px 28px; font-size: 16px; width: 100%; justify-content: center; }

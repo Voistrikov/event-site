@@ -10,11 +10,15 @@ import {
   cancelEvent,
   completeEvent,
   createEvent,
+  addEventPhotos,
+  deleteEventPhoto,
+  setMainEventPhoto,
 } from '../api/eventsApi';
 import type { Event, EventFormData, EventStatus, EventType } from '../types/event.types';
 import { EVENT_TYPES, eventTypeLabel } from '../types/event.types';
 import { formatDate } from '../utils/dateFormat';
-import EventForm from '../components/events/EventForm';
+import EventForm, { type PhotoChanges } from '../components/events/EventForm';
+import Button from '../components/common/Button';
 import '../styles/AdminPage.css';
 import '../styles/ManageEventsPage.css';
 
@@ -198,16 +202,25 @@ export default function ManageEventsPage() {
     }
   };
 
-  const handleFormSubmit = async (data: EventFormData, publishAfterSave: boolean) => {
+  const handleFormSubmit = async (data: EventFormData, publishAfterSave: boolean, photoChanges: PhotoChanges) => {
     setModalError(null);
     try {
       if (editingEvent) {
         await updateEvent(editingEvent.id, data);
+        for (const photoId of photoChanges.removePhotoIds) await deleteEventPhoto(editingEvent.id, photoId);
+        let uploaded: { id: string }[] = [];
+        if (photoChanges.files.length) uploaded = (await addEventPhotos(editingEvent.id, photoChanges.files)).data.photos;
+        if (photoChanges.mainPhotoId) await setMainEventPhoto(editingEvent.id, photoChanges.mainPhotoId);
+        else if (photoChanges.mainNewIndex !== undefined && uploaded[photoChanges.mainNewIndex]) await setMainEventPhoto(editingEvent.id, uploaded[photoChanges.mainNewIndex].id);
         if (publishAfterSave && editingEvent.status === 'DRAFT') {
           await publishEvent(editingEvent.id);
         }
       } else {
         const response = await createEvent(data);
+        if (photoChanges.files.length) {
+          const uploaded = await addEventPhotos(response.data.id, photoChanges.files);
+          if (photoChanges.mainNewIndex !== undefined) await setMainEventPhoto(response.data.id, uploaded.data.photos[photoChanges.mainNewIndex].id);
+        }
         if (publishAfterSave) {
           await publishEvent(response.data.id);
         }
@@ -232,13 +245,11 @@ export default function ManageEventsPage() {
           <p className="page-subtitle">Διαχείριση των εκδηλώσεών σας και παρακολούθηση κρατήσεων</p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
+          <Button
             onClick={handleOpenCreate}
           >
             + Νέα Εκδήλωση
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -279,14 +290,12 @@ export default function ManageEventsPage() {
               ))}
             </select>
 
-            <button
-              type="button"
-              className="btn btn-primary btn-sm"
+            <Button
               onClick={() => load(1)}
               disabled={loading}
             >
               {loading ? 'Φόρτωση…' : '↻ Ανανέωση'}
-            </button>
+            </Button>
           </div>
         </div>
 

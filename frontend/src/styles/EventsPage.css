@@ -76,6 +76,8 @@
 .events-profile-button:hover { background: #d1d5db; transform: translateY(-1px); }
 .events-profile-button svg { width: 24px; height: 24px; }
 .events-profile-button img { width: 100%; height: 100%; object-fit: cover; }
+.event-card-image--empty { background: #e5e7eb; }
+.map-popup-image-empty { height: 140px; background: #e5e7eb; }
 
 /* Split-screen layout */
 .events-split-container {

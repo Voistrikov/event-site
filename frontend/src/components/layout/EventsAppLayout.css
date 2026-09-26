@@ -2,12 +2,64 @@
   min-height: calc(100vh - 72px);
 }
 
+.events-navbar {
+  min-height: 72px;
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) minmax(280px, 520px) minmax(170px, 1fr);
+  align-items: center;
+  gap: 24px;
+  padding: 12px 32px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: relative;
+  z-index: 1100;
+}
+
 .events-navbar-leading {
   display: flex;
   align-items: center;
   justify-self: start;
   gap: 14px;
 }
+
+.events-brand-link {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 9px;
+  color: #1b3858;
+  text-decoration: none;
+}
+.events-brand-link:hover { text-decoration: none; }
+.events-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: #fff;
+  background: #1b3858;
+  border-radius: 9px;
+  font-weight: 800;
+}
+.events-brand-link .brand-name { font-size: 1.1rem; letter-spacing: .7px; }
+
+.events-navbar-search {
+  width: 100%;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  background: #fff;
+  color: #6b7280;
+  transition: border-color .15s, box-shadow .15s;
+}
+.events-navbar-search:focus-within { border-color: #1b3858; box-shadow: 0 0 0 3px rgba(27, 56, 88, .12); }
+.events-navbar-search svg { width: 19px; height: 19px; flex: 0 0 auto; }
+.events-navbar-search input { width: 100%; min-width: 0; border: 0; outline: 0; color: #1f2937; background: transparent; font-size: 14px; }
+.events-navbar-search input::placeholder { color: #9ca3af; }
 
 .events-menu-button {
   display: inline-flex;
@@ -31,6 +83,25 @@
   position: relative;
   justify-self: end;
 }
+
+.events-profile-button {
+  display: grid;
+  place-items: center;
+  justify-self: end;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  color: #9ca3af;
+  background: #e5e7eb;
+  cursor: pointer;
+  transition: background .15s, transform .15s;
+}
+.events-profile-button:hover { background: #d1d5db; transform: translateY(-1px); }
+.events-profile-button svg { width: 24px; height: 24px; }
+.events-profile-button img { width: 100%; height: 100%; object-fit: cover; }
 
 .events-profile-menu {
   position: absolute;
@@ -140,5 +211,7 @@
 .events-sidebar-section-title { padding: 0 12px 4px; color: #94a3b8; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
 
 @media (max-width: 800px) {
+  .events-navbar { grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; padding: 10px 16px; }
+  .events-brand-link .brand-name { display: none; }
   .events-profile-menu { right: -4px; }
 }

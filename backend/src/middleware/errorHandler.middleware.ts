@@ -3,6 +3,7 @@ import { ZodError } from 'zod';
 import { logger } from '../config/logger.js';
 import { sendError } from '../utils/response.util.js';
 import { AppError } from '../utils/appError.js';
+import multer from 'multer';
 
 export function errorHandler(
   err: unknown,
@@ -12,6 +13,14 @@ export function errorHandler(
 ): void {
   if (err instanceof AppError) {
     sendError(res, err.statusCode, err.message, err.code);
+    return;
+  }
+
+  if (err instanceof multer.MulterError) {
+    const message = err.code === 'LIMIT_FILE_SIZE' ? 'Each image must be 5 MB or smaller.'
+      : err.code === 'LIMIT_FILE_COUNT' || err.code === 'LIMIT_UNEXPECTED_FILE' ? 'A maximum of 3 event photos is allowed.'
+        : 'Invalid upload.';
+    sendError(res, 400, message, 'VALIDATION_ERROR');
     return;
   }
 

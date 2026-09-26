@@ -1,8 +1,11 @@
 import type { NextFunction, Request, Response } from 'express';
 import { prisma } from '../config/prisma.js';
+import type { Prisma } from '../generated/prisma/client.js';
 import { getRecommendations } from '../services/recommendation.service.js';
 import type { AuthenticatedRequest, AuthenticatedUser } from '../types/auth.types.js';
 import { AppError } from '../utils/appError.js';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 interface TicketTypeInput {
   id?: string;
@@ -69,10 +72,10 @@ function assertOwnerOrAdmin(event: { organizerId: string }, user: AuthenticatedU
 
 const eventInclude = {
   ticketTypes: true,
-  photos: true,
+  photos: { orderBy: [{ isMain: 'desc' }, { sortOrder: 'asc' }] },
   categories: { include: { category: true } },
   _count: { select: { bookings: true } },
-} as const;
+} satisfies Prisma.EventInclude;
 
 export const getEvents = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -325,6 +328,82 @@ export const updateEvent = async (req: Request, res: Response, next: NextFunctio
   } catch (error) {
     next(error);
   }
+};
+
+function eventPhotos(req: Request): Express.Multer.File[] {
+  return Array.isArray(req.files) ? req.files : [];
+}
+
+async function removeUploadedFiles(files: Express.Multer.File[]): Promise<void> {
+  await Promise.all(files.map((file) => fs.unlink(file.path).catch(() => undefined)));
+}
+
+async function removeStoredEventPhoto(filename: string): Promise<void> {
+  if (!filename.startsWith('/uploads/events/')) return;
+  await fs.unlink(path.resolve(process.cwd(), 'uploads', 'events', path.basename(filename))).catch(() => undefined);
+}
+
+export const addEventPhotos = async (req: Request, res: Response, next: NextFunction) => {
+  const files = eventPhotos(req);
+  try {
+    if (files.length === 0) throw new AppError(400, 'VALIDATION_ERROR', 'At least one event photo is required.');
+    const id = String(req.params['id']);
+    const event = await prisma.event.findUnique({ where: { id }, include: { photos: true } });
+    if (!event) throw new AppError(404, 'EVENT_NOT_FOUND', 'Event not found.');
+    assertOwnerOrAdmin(event, requireUser(req));
+    if (event.photos.length + files.length > 3) throw new AppError(400, 'VALIDATION_ERROR', 'An event can have at most 3 photos.');
+    const created = await prisma.$transaction(async (tx) => {
+      const hasMain = event.photos.some((photo) => photo.isMain);
+      const maxOrder = event.photos.reduce((max, photo) => Math.max(max, photo.sortOrder), -1);
+      const photos = [];
+      for (const [index, file] of files.entries()) {
+        photos.push(await tx.eventPhoto.create({ data: { eventId: id, filename: `/uploads/events/${file.filename}`, sortOrder: maxOrder + index + 1, isMain: !hasMain && index === 0 } }));
+      }
+      return photos;
+    });
+    res.status(201).json({ photos: created });
+  } catch (error) {
+    await removeUploadedFiles(files);
+    next(error);
+  }
+};
+
+export const deleteEventPhoto = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const eventId = String(req.params['id']);
+    const photoId = String(req.params['photoId']);
+    const event = await prisma.event.findUnique({ where: { id: eventId }, include: { photos: { orderBy: { sortOrder: 'asc' } } } });
+    if (!event) throw new AppError(404, 'EVENT_NOT_FOUND', 'Event not found.');
+    assertOwnerOrAdmin(event, requireUser(req));
+    const photo = event.photos.find((item) => item.id === photoId);
+    if (!photo) throw new AppError(404, 'NOT_FOUND', 'Photo not found.');
+    await prisma.$transaction(async (tx) => {
+      await tx.eventPhoto.delete({ where: { id: photoId } });
+      if (photo.isMain) {
+        const replacement = event.photos.filter((item) => item.id !== photoId)[0];
+        if (replacement) await tx.eventPhoto.update({ where: { id: replacement.id }, data: { isMain: true } });
+      }
+    });
+    await removeStoredEventPhoto(photo.filename);
+    res.status(204).send();
+  } catch (error) { next(error); }
+};
+
+export const setMainEventPhoto = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const eventId = String(req.params['id']);
+    const photoId = String(req.params['photoId']);
+    const event = await prisma.event.findUnique({ where: { id: eventId } });
+    if (!event) throw new AppError(404, 'EVENT_NOT_FOUND', 'Event not found.');
+    assertOwnerOrAdmin(event, requireUser(req));
+    const photo = await prisma.eventPhoto.findFirst({ where: { id: photoId, eventId } });
+    if (!photo) throw new AppError(404, 'NOT_FOUND', 'Photo not found.');
+    const updated = await prisma.$transaction(async (tx) => {
+      await tx.eventPhoto.updateMany({ where: { eventId }, data: { isMain: false } });
+      return tx.eventPhoto.update({ where: { id: photoId }, data: { isMain: true } });
+    });
+    res.json({ photo: updated });
+  } catch (error) { next(error); }
 };
 
 export const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {

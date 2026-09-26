@@ -10,20 +10,40 @@ function userId(req: Request): string {
 export const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const senderId = userId(req);
-    const { recipientId, subject, body } = req.body;
+    const { recipientId, recipientUsername, username, subject, body } = req.body;
+    const recipientKey = String(recipientId || recipientUsername || username || '').trim();
 
-    if (!recipientId || !subject || !body) {
+    if (!recipientKey || !subject || !body) {
       res.status(400).json({ error: 'Missing required fields' });
+      return;
+    }
+
+    const cleanUsername = recipientKey.startsWith('@') ? recipientKey.slice(1).trim() : recipientKey;
+
+    // Find recipient by ID first or by username (case-insensitive)
+    const recipient = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { id: recipientKey },
+          { username: { equals: recipientKey, mode: 'insensitive' } },
+          { username: { equals: cleanUsername, mode: 'insensitive' } },
+        ],
+      },
+      select: { id: true, username: true },
+    });
+
+    if (!recipient) {
+      res.status(404).json({ error: 'Ο παραλήπτης δεν βρέθηκε (Recipient not found).' });
       return;
     }
 
     const message = await prisma.message.create({
       data: {
         senderId,
-        recipientId,
-        subject,
-        body
-      }
+        recipientId: recipient.id,
+        subject: String(subject).trim(),
+        body: String(body).trim(),
+      },
     });
 
     res.status(201).json(message);
@@ -38,9 +58,9 @@ export const getInbox = async (req: Request, res: Response, next: NextFunction) 
     const messages = await prisma.message.findMany({
       where: { recipientId: currentUserId, deletedByRecipient: false },
       include: {
-        sender: { select: { firstName: true, lastName: true, avatarUrl: true, email: true } }
+        sender: { select: { id: true, username: true, firstName: true, lastName: true, avatarUrl: true, email: true } },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
     res.json(messages);
   } catch (error) {
@@ -54,9 +74,9 @@ export const getSent = async (req: Request, res: Response, next: NextFunction) =
     const messages = await prisma.message.findMany({
       where: { senderId: currentUserId, deletedBySender: false },
       include: {
-        recipient: { select: { firstName: true, lastName: true, avatarUrl: true, email: true } }
+        recipient: { select: { id: true, username: true, firstName: true, lastName: true, avatarUrl: true, email: true } },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
     res.json(messages);
   } catch (error) {
