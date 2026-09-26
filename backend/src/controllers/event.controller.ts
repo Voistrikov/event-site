@@ -90,7 +90,12 @@ export const getEvents = async (req: Request, res: Response, next: NextFunction)
     const canManageListing = requestedOrganizerId !== undefined
       && viewer !== undefined
       && (viewer.id === requestedOrganizerId || viewer.role === 'ADMIN');
-    if (!canManageListing) where.status = 'PUBLISHED';
+    const statusParam = stringValue(req.query['status']);
+    if (canManageListing && statusParam && ['DRAFT', 'PUBLISHED', 'COMPLETED', 'CANCELLED'].includes(statusParam)) {
+      where.status = statusParam;
+    } else if (!canManageListing) {
+      where.status = 'PUBLISHED';
+    }
     if (requestedOrganizerId) where.organizerId = requestedOrganizerId;
     if (stringValue(search)) {
       where.OR = ['title', 'description', 'city', 'country'].map((field) => ({

@@ -8,19 +8,34 @@ interface EventFormProps {
   initial?: Partial<Event>;
   onSubmit: (data: EventFormData, publishAfterSave: boolean) => Promise<void> | void;
   submitLabel?: string;
+  onCancel?: () => void;
 }
 
 const FALLBACK_CATEGORIES = ['Μουσική', 'Τέχνες', 'Εκπαίδευση', 'Τεχνολογία', 'Αθλητισμός', 'Πολιτισμός'];
-const toLocalDateTime = (value?: string) => value ? new Date(value).toISOString().slice(0, 16) : '';
+const toLocalDateTime = (value?: string | Date) => {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
 
-export default function EventForm({ initial = {}, onSubmit, submitLabel = 'Αποθήκευση ως Πρόχειρο' }: EventFormProps) {
+export default function EventForm({ initial = {}, onSubmit, submitLabel = 'Αποθήκευση ως Πρόχειρο', onCancel }: EventFormProps) {
   const [form, setForm] = useState({
     title: initial.title ?? '', description: initial.description ?? '', eventType: (initial.eventType ?? '') as EventType | '',
     venue: initial.venue ?? '', address: initial.address ?? '', city: initial.city ?? '', country: initial.country ?? '',
     latitude: initial.latitude, longitude: initial.longitude, startDateTime: toLocalDateTime(initial.startDateTime),
     endDateTime: toLocalDateTime(initial.endDateTime), capacity: initial.capacity ?? 1,
   });
-  const initialCategories = initial.categories?.map((entry) => entry.category?.name).filter(Boolean) ?? [];
+  const initialCategories = (initial.categories ?? [])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .map((entry: any) => (typeof entry === 'string' ? entry : entry.category?.name || entry.name))
+    .filter(Boolean) as string[];
   const [categories, setCategories] = useState<string[]>(initialCategories);
   const [categoryOptions, setCategoryOptions] = useState<string[]>(() => [...new Set([...FALLBACK_CATEGORIES, ...initialCategories])]);
   const [ticketTypes, setTicketTypes] = useState<Array<{ id?: string; name: string; price: number; quantity: number }>>((initial.ticketTypes ?? []).map((ticket) => ({ id: ticket.id, name: ticket.name, price: Number(ticket.price), quantity: ticket.quantity })));
@@ -74,6 +89,17 @@ export default function EventForm({ initial = {}, onSubmit, submitLabel = 'Απ�
       <div className="event-form-actions">
         <button className="event-form-submit" type="submit" onClick={() => setPublishAfterSave(false)} disabled={submitting || !form.eventType || categories.length === 0 || ticketTypes.length === 0 || totalTickets === 0 || totalTickets > form.capacity}>{submitting && !publishAfterSave ? 'Αποθήκευση...' : submitLabel}</button>
         {(initial.status === undefined || initial.status === 'DRAFT') && <button className="event-form-submit event-form-publish" type="submit" onClick={() => setPublishAfterSave(true)} disabled={submitting || !form.eventType || categories.length === 0 || ticketTypes.length === 0 || totalTickets === 0 || totalTickets > form.capacity}>{submitting && publishAfterSave ? 'Δημοσίευση...' : 'Αποθήκευση & Δημοσίευση'}</button>}
+        {onCancel && (
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={onCancel}
+            disabled={submitting}
+            style={{ padding: '12px 20px', borderRadius: 8 }}
+          >
+            Ακύρωση
+          </button>
+        )}
       </div>
     </form>
   );

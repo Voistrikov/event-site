@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import * as adminService from '../services/admin.service.js';
 import { sendError, sendPaginated } from '../utils/response.util.js';
+import type { AuthenticatedRequest } from '../types/auth.types.js';
 
 const listUsersQuerySchema = z.object({
   role:   z.enum(['ATTENDEE', 'ORGANIZER', 'ADMIN']).optional(),
@@ -36,6 +37,19 @@ export async function updateUserStatusHandler(
   try {
     const { id } = req.params as { id: string };
     const { status } = updateStatusBodySchema.parse(req.body);
+
+    if (status === 'REJECTED') {
+      if ((req as AuthenticatedRequest).user?.id === id) {
+        res.status(400).json({ message: 'Admin cannot reject their own account.' });
+        return;
+      }
+      const targetUser = await adminService.getUserById(id);
+      if (targetUser.role === 'ADMIN') {
+        res.status(400).json({ message: 'Cannot reject an administrator account.' });
+        return;
+      }
+    }
+
     const user = await adminService.updateUserStatus(id, status);
     res.json({ user });
   } catch (err) {

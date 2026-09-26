@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import { getUserDetails, updateUserStatus } from '../api/adminApi';
 import type { User, UserStatus, Role } from '../types/user.types';
+import '../styles/AdminPage.css';
 
 function StatusBadge({ status }: { status: UserStatus }) {
   const cls = status === 'APPROVED' ? 'badge badge-approved'
@@ -19,6 +21,7 @@ function RoleBadge({ role }: { role: Role }) {
 
 export default function AdminUserDetailsPage() {
   const { id } = useParams<{ id: string }>();
+  const { user: currentUser } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +76,7 @@ export default function AdminUserDetailsPage() {
 
   return (
     <div className="admin-page">
-      <div className="profile-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="profile-page-header">
         <div>
           <Link to="/admin" className="btn btn-secondary btn-sm" style={{ marginBottom: 16 }}>
             ← Back to Users List
@@ -86,7 +89,7 @@ export default function AdminUserDetailsPage() {
         </div>
         
         <div style={{ display: 'flex', gap: '10px' }}>
-          {user.status !== 'APPROVED' && (
+          {user.status !== 'APPROVED' && user.role !== 'ADMIN' && (
             <button
               className="btn btn-success"
               disabled={acting}
@@ -95,7 +98,7 @@ export default function AdminUserDetailsPage() {
               ✓ Approve
             </button>
           )}
-          {user.status !== 'REJECTED' && (
+          {user.status !== 'REJECTED' && user.role !== 'ADMIN' && user.id !== currentUser?.id && (
             <button
               className="btn btn-danger"
               disabled={acting}

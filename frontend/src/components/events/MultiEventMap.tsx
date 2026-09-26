@@ -36,6 +36,10 @@ export default function MultiEventMap({ events, onViewDetails, mapLocation, onMa
     const map = L.map(mapRef.current).setView(center, 12);
     mapInstanceRef.current = map;
 
+    const resizeTimer = setTimeout(() => {
+      map.invalidateSize();
+    }, 200);
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
       maxZoom: 19,
@@ -137,6 +141,7 @@ export default function MultiEventMap({ events, onViewDetails, mapLocation, onMa
       }
 
     return () => {
+      clearTimeout(resizeTimer);
       map.remove();
       mapInstanceRef.current = null;
       markersRef.current = [];

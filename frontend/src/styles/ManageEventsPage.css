@@ -1,0 +1,107 @@
+/* Manage Events Page Styles */
+
+/* Modal backdrop - centered in x-y */
+.create-event-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  box-sizing: border-box;
+  padding: 24px;
+}
+
+/* Modal box - centered in x-y, 40% of total width, scrollable inside if height exceeds */
+.create-event-modal-box {
+  width: 40%;
+  max-width: 40%;
+  max-height: 90vh;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+  overflow-y: auto;
+  box-sizing: border-box;
+  position: relative;
+  padding: 24px;
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 900px) {
+  .create-event-modal-box {
+    width: 90%;
+    max-width: 90%;
+  }
+}
+
+/* Sticky header inside modal */
+.create-event-modal-header {
+  position: sticky;
+  top: -24px;
+  margin: -24px -24px 20px -24px;
+  padding: 18px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.create-event-modal-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1b3858;
+}
+
+.create-event-modal-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.create-event-modal-close:hover {
+  color: #111827;
+  background-color: #f3f4f6;
+}
+
+/* Form styling inside modal */
+.create-event-modal-box .event-form {
+  max-width: 100%;
+}
+
+.create-event-modal-box .event-form-grid {
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.create-event-modal-box .ticket-type-row {
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 8px;
+}
+
+.create-event-modal-box .ticket-type-row input {
+  min-width: 0;
+  width: 100%;
+}

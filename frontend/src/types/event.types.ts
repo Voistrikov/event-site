@@ -44,7 +44,7 @@ export interface Event {
   capacity: number;
   status: EventStatus;
   organizerId: string;
-  organizer?: Pick<User, 'id' | 'firstName' | 'lastName' | 'avatarUrl'>;
+  organizer?: Pick<User, 'id' | 'firstName' | 'lastName' | 'avatarUrl'> & Partial<Pick<User, 'username' | 'email'>>;
   categories: EventCategory[];
   ticketTypes: TicketType[];
   photos?: EventPhoto[];

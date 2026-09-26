@@ -20,6 +20,12 @@ export default function OrganizerBookingList({ bookings }: OrganizerBookingListP
             <div className="booking-detail">
               <span className="booking-detail-label">Επισκέπτης</span>
               <span className="booking-detail-value">{b.user?.firstName} {b.user?.lastName}</span>
+              {(b.user?.username || b.user?.email) && (
+                <span style={{ fontSize: '0.82rem', color: '#64748b', marginTop: '2px' }}>
+                  {b.user?.username ? `@${b.user.username} ` : ''}
+                  {b.user?.email ? `• ${b.user.email}` : ''}
+                </span>
+              )}
             </div>
             <div className="booking-detail">
               <span className="booking-detail-label">Τύπος εισιτηρίου</span>

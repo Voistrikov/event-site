@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import { listUsers, updateUserStatus, exportEventsJson, exportEventsXml } from '../api/adminApi';
 import type { ListUsersResponse } from '../api/adminApi';
 import type { User, Role, UserStatus } from '../types/user.types';
+import '../styles/AdminPage.css';
 
 const ROLE_OPTIONS:   Array<{ label: string; value: Role | '' }>       = [
   { label: 'All Roles',    value: '' },
@@ -32,6 +34,7 @@ function StatusBadge({ status }: { status: UserStatus }) {
 }
 
 export default function AdminPage() {
+  const { user: currentUser } = useAuth();
   const [result,   setResult]   = useState<ListUsersResponse | null>(null);
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState<string | null>(null);
@@ -93,7 +96,7 @@ export default function AdminPage() {
 
   return (
     <div className="admin-page">
-      <div className="profile-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="profile-page-header">
         <div>
           <h1 className="profile-page-title">🛡️ Πίνακας Ελέγχου</h1>
           <p className="page-subtitle">Διαχείριση χρηστών και εξαγωγή δεδομένων (XML/JSON)</p>
@@ -186,7 +189,7 @@ export default function AdminPage() {
                         </td>
                         <td>
                           <div className="table-actions">
-                            {u.status !== 'APPROVED' && (
+                            {u.status !== 'APPROVED' && u.role !== 'ADMIN' && (
                               <button
                                 className="btn btn-success btn-sm"
                                 disabled={acting === u.id}
@@ -195,7 +198,7 @@ export default function AdminPage() {
                                 Approve
                               </button>
                             )}
-                            {u.status !== 'REJECTED' && (
+                            {u.status !== 'REJECTED' && u.role !== 'ADMIN' && u.id !== currentUser?.id && (
                               <button
                                 className="btn btn-danger btn-sm"
                                 disabled={acting === u.id}
@@ -203,9 +206,6 @@ export default function AdminPage() {
                               >
                                 Reject
                               </button>
-                            )}
-                            {u.status === 'APPROVED' && u.role === 'ADMIN' && (
-                              <span style={{ fontSize: 12, color: '#6b7280' }}>—</span>
                             )}
                             <Link to={`/admin/users/${u.id}`} className="btn btn-secondary btn-sm">
                               Προβολή

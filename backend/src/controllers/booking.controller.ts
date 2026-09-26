@@ -93,7 +93,7 @@ export const getUserBookings = async (req: Request, res: Response, next: NextFun
             country: true,
             photos: true,
             status: true,
-            organizer: { select: { id: true, firstName: true, email: true } },
+            organizer: { select: { id: true, firstName: true, lastName: true, username: true, email: true } },
           },
         },
         ticketType: true,
@@ -112,7 +112,7 @@ export const getOrganizerBookings = async (req: Request, res: Response, next: Ne
       where: { event: { organizerId: currentUser(req).id } },
       include: {
         event: { select: { id: true, title: true, city: true, photos: true } },
-        user: { select: { id: true, firstName: true, lastName: true, email: true, phone: true } },
+        user: { select: { id: true, username: true, firstName: true, lastName: true, email: true, phone: true } },
         ticketType: true,
       },
       orderBy: { createdAt: 'desc' },

@@ -1,0 +1,53 @@
+.pending-approval-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--bg);
+  box-sizing: border-box;
+}
+
+.pending-approval-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  padding: 44px 36px;
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.pending-approval-icon {
+  font-size: 52px;
+  margin-bottom: 18px;
+  line-height: 1;
+}
+
+.pending-approval-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 12px 0;
+}
+
+.pending-approval-description {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0 0 28px 0;
+  max-width: 400px;
+}
+
+@media (max-width: 480px) {
+  .pending-approval-card {
+    padding: 32px 20px;
+  }
+}

@@ -15,35 +15,105 @@ const STATUS_LABELS = { DRAFT: 'Πρόχειρο', PUBLISHED: 'Δημοσιευ�
 
 export default function EventTable({ events, onDelete, onPublish, onCancel, onComplete }: EventTableProps) {
   return (
-    <table className="event-table">
-      <thead>
-        <tr>
-          <th>Τίτλος</th>
-          <th>Τύπος</th>
-          <th>Ημερομηνία</th>
-          <th>Κατάσταση</th>
-          <th>Ενέργειες</th>
-        </tr>
-      </thead>
-      <tbody>
-        {events.map((e) => (
-          <tr key={e.id}>
-            <td>{e.title}</td>
-            <td>{eventTypeLabel(e.eventType)}</td>
-            <td>{formatDate(e.startDateTime)}</td>
-            <td><span className={`event-table-status status-${e.status.toLowerCase()}`}>{STATUS_LABELS[e.status]}</span></td>
-            <td>
-              {(e.status === 'DRAFT' || e.status === 'PUBLISHED') && <Link to={`/events/${e.id}/edit`}>Επεξεργασία</Link>}
-              {onPublish && e.status === 'DRAFT' && <button onClick={() => onPublish(e.id)} style={{ marginLeft: '10px' }}>Δημοσίευση</button>}
-              {onCancel && e.status === 'PUBLISHED' && <button onClick={() => onCancel(e.id)} style={{ marginLeft: '10px' }}>Ακύρωση</button>}
-              {onComplete && e.status === 'PUBLISHED' && new Date(e.endDateTime) < new Date() && <button onClick={() => onComplete(e.id)} style={{ marginLeft: '10px' }}>Ολοκλήρωση</button>}
-              {onDelete && (e.status === 'DRAFT' || (e.status === 'PUBLISHED' && (e._count?.bookings ?? 0) === 0)) && (
-                <button onClick={() => onDelete(e.id)} style={{ marginLeft: '10px' }}>Διαγραφή</button>
-              )}
-            </td>
+    <div className="table-scroll">
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>Εκδήλωση</th>
+            <th>Τύπος</th>
+            <th>Ημερομηνία</th>
+            <th>Κατάσταση</th>
+            <th>Ενέργειες</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {events.length === 0 ? (
+            <tr>
+              <td colSpan={5} style={{ textAlign: 'center', color: '#6b7280', padding: '32px' }}>
+                Δεν υπάρχουν εκδηλώσεις.
+              </td>
+            </tr>
+          ) : (
+            events.map((e) => (
+              <tr key={e.id}>
+                <td>
+                  <div style={{ fontWeight: 600 }}>{e.title}</div>
+                  <div style={{ fontSize: 12, color: '#6b7280' }}>
+                    {e.venue ? `${e.venue}, ${e.city}` : e.city || '—'}
+                  </div>
+                </td>
+                <td>{eventTypeLabel(e.eventType)}</td>
+                <td style={{ color: '#6b7280', fontSize: 13 }}>{formatDate(e.startDateTime)}</td>
+                <td>
+                  <span
+                    className={
+                      e.status === 'PUBLISHED'
+                        ? 'badge badge-approved'
+                        : e.status === 'DRAFT'
+                        ? 'badge badge-pending'
+                        : e.status === 'CANCELLED'
+                        ? 'badge badge-rejected'
+                        : 'badge badge-organizer'
+                    }
+                  >
+                    {STATUS_LABELS[e.status] || e.status}
+                  </span>
+                </td>
+                <td>
+                  <div className="table-actions">
+                    <Link to={`/events/${e.id}`} className="btn btn-secondary btn-sm">
+                      Προβολή
+                    </Link>
+                    {(e.status === 'DRAFT' || e.status === 'PUBLISHED') && (
+                      <Link to={`/events/${e.id}/edit`} className="btn btn-secondary btn-sm">
+                        Επεξεργασία
+                      </Link>
+                    )}
+                    {onPublish && e.status === 'DRAFT' && (
+                      <button
+                        type="button"
+                        className="btn btn-success btn-sm"
+                        onClick={() => onPublish(e.id)}
+                      >
+                        Δημοσίευση
+                      </button>
+                    )}
+                    {onComplete && e.status === 'PUBLISHED' && new Date(e.endDateTime) < new Date() && (
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm"
+                        onClick={() => onComplete(e.id)}
+                      >
+                        Ολοκλήρωση
+                      </button>
+                    )}
+                    {onCancel && e.status === 'PUBLISHED' && (
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        onClick={() => onCancel(e.id)}
+                      >
+                        Ακύρωση
+                      </button>
+                    )}
+                    {onDelete &&
+                      (e.status === 'DRAFT' ||
+                        (e.status === 'PUBLISHED' && (e._count?.bookings ?? 0) === 0)) && (
+                        <button
+                          type="button"
+                          className="btn btn-danger btn-sm"
+                          onClick={() => onDelete(e.id)}
+                        >
+                          Διαγραφή
+                        </button>
+                      )}
+                  </div>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 }
