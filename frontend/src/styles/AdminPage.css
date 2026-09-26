@@ -1,0 +1,99 @@
+.admin-page {
+  width: 75%;
+  margin: 36px auto 48px auto;
+}
+
+.admin-page .profile-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.admin-page .profile-page-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1b3858;
+  margin: 0 0 6px 0;
+  line-height: 1.25;
+}
+
+.admin-page .page-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.admin-page .table-card {
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* User details page cards */
+.admin-page .info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.admin-page .info-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #1b3858;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.admin-page .info-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-page .info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  padding: 4px 0;
+}
+
+.admin-page .info-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.admin-page .info-value {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .admin-page {
+    width: 90%;
+    margin-top: 24px;
+    margin-bottom: 36px;
+  }
+
+  .admin-page .profile-page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-page .profile-info-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-page {
+    width: 95%;
+    margin-top: 16px;
+    margin-bottom: 24px;
+  }
+}

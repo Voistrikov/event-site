@@ -1,0 +1,24 @@
+.ticket-selector h3 { margin-top: 0; color: #1b3858; }
+.ticket-type-list { display: grid; gap: 10px; margin: 16px 0; }
+.ticket-type-card { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 14px; text-align: left; background: #fff; border: 1px solid #d7dee7; border-radius: 10px; cursor: pointer; }
+.ticket-type-card.selected { border-color: #34aadc; box-shadow: 0 0 0 2px rgba(52,170,220,.15); }
+.ticket-type-card:disabled { cursor: not-allowed; opacity: .55; }
+.ticket-name { font-weight: 700; }
+.ticket-price { grid-column: 2; grid-row: 1 / 3; align-self: center; color: #1b3858; }
+.ticket-available { color: #64748b; font-size: .82rem; }
+.quantity-row, .price-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 0; }
+.quantity-row input { width: 80px; padding: 9px; border: 1px solid #cbd5e1; border-radius: 7px; }
+.price-summary { padding: 12px; background: #f1f7fb; border-radius: 8px; }
+.ticket-book-button, .confirm-btn { width: 100%; border: 0; border-radius: 8px; padding: 13px; color: #fff; background: #1b3858; font-weight: 700; cursor: pointer; }
+.ticket-book-button:disabled, .confirm-btn:disabled { opacity: .55; cursor: not-allowed; }
+.confirmation-overlay { position: fixed; inset: 0; z-index: 3000; display: grid; place-items: center; padding: 20px; background: rgba(15,23,42,.62); }
+.confirmation-dialog { width: min(440px, 100%); padding: 26px; background: #fff; border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+.confirmation-dialog h4 { margin: 0 0 14px; font-size: 1.25rem; }
+.booking-confirm-summary { display: grid; gap: 9px; margin: 0; }
+.booking-confirm-summary div { display: grid; grid-template-columns: minmax(115px, .8fr) 1.2fr; gap: 12px; }
+.booking-confirm-summary dt { color: #64748b; font-weight: 650; }
+.booking-confirm-summary dd { margin: 0; color: #1e293b; font-weight: 650; }
+.booking-warning { color: #9a6700; background: #fff8dc; padding: 10px; border-radius: 7px; font-size: .9rem; }
+.dialog-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+.dialog-buttons button { padding: 10px 14px; border-radius: 7px; border: 1px solid #cbd5e1; cursor: pointer; }
+.dialog-buttons .confirm-btn { width: auto; border: 0; }
