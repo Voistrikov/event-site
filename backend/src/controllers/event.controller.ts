@@ -70,6 +70,24 @@ function assertOwnerOrAdmin(event: { organizerId: string }, user: AuthenticatedU
   }
 }
 
+/**
+ * Puts events the recommender picked for the viewer first (in recommendation
+ * order), keeping every other event in its existing order behind them. Used
+ * so recommended events surface inline in the normal listing instead of a
+ * separate section, including under any active filters.
+ */
+function withRecommendedFirst<T extends { id: string }>(items: T[], recommendedIds: string[]): T[] {
+  if (recommendedIds.length === 0) return items;
+  const rank = new Map(recommendedIds.map((id, index) => [id, index]));
+  const recommended: T[] = [];
+  const rest: T[] = [];
+  for (const item of items) {
+    (rank.has(item.id) ? recommended : rest).push(item);
+  }
+  recommended.sort((a, b) => rank.get(a.id)! - rank.get(b.id)!);
+  return [...recommended, ...rest];
+}
+
 const eventInclude = {
   ticketTypes: true,
   photos: { orderBy: [{ isMain: 'desc' }, { sortOrder: 'asc' }] },
@@ -87,7 +105,7 @@ export const getEvents = async (req: Request, res: Response, next: NextFunction)
     if ((minPrice !== undefined && minPrice < 0) || (maxPrice !== undefined && maxPrice < 0)) throw new AppError(400, 'VALIDATION_ERROR', 'Prices cannot be negative.');
     if (minPrice !== undefined && maxPrice !== undefined && minPrice > maxPrice) throw new AppError(400, 'VALIDATION_ERROR', 'minPrice cannot exceed maxPrice.');
 
-    const where: any = {};
+    const where: Prisma.EventWhereInput = {};
     const requestedOrganizerId = stringValue(organizerId);
     const viewer = optionalUser(req);
     const canManageListing = requestedOrganizerId !== undefined
@@ -95,21 +113,21 @@ export const getEvents = async (req: Request, res: Response, next: NextFunction)
       && (viewer.id === requestedOrganizerId || viewer.role === 'ADMIN');
     const statusParam = stringValue(req.query['status']);
     if (canManageListing && statusParam && ['DRAFT', 'PUBLISHED', 'COMPLETED', 'CANCELLED'].includes(statusParam)) {
-      where.status = statusParam;
+      where.status = statusParam as 'DRAFT' | 'PUBLISHED' | 'COMPLETED' | 'CANCELLED';
     } else if (!canManageListing) {
       where.status = 'PUBLISHED';
     }
     if (requestedOrganizerId) where.organizerId = requestedOrganizerId;
     if (stringValue(search)) {
       where.OR = ['title', 'description', 'city', 'country'].map((field) => ({
-        [field]: { contains: stringValue(search), mode: 'insensitive' },
+        [field]: { contains: stringValue(search)!, mode: 'insensitive' as const },
       }));
     }
     if (stringValue(category)) {
-      where.categories = { some: { category: { name: { equals: stringValue(category), mode: 'insensitive' } } } };
+      where.categories = { some: { category: { name: { equals: stringValue(category)!, mode: 'insensitive' } } } };
     }
-    if (stringValue(eventType)) where.eventType = { equals: stringValue(eventType), mode: 'insensitive' };
-    if (stringValue(city)) where.city = { equals: stringValue(city), mode: 'insensitive' };
+    if (stringValue(eventType)) where.eventType = { equals: stringValue(eventType)!, mode: 'insensitive' };
+    if (stringValue(city)) where.city = { equals: stringValue(city)!, mode: 'insensitive' };
 
     if (dateFrom !== undefined || dateTo !== undefined) {
       where.startDateTime = {};
@@ -121,10 +139,19 @@ export const getEvents = async (req: Request, res: Response, next: NextFunction)
     }
 
     if (minPrice !== undefined || maxPrice !== undefined) {
-      where.ticketTypes = { some: {} };
-      if (minPrice !== undefined) where.ticketTypes.none = { price: { lt: minPrice } };
-      if (maxPrice !== undefined) where.ticketTypes.some = { price: { lte: maxPrice } };
+      const priceFilter: Record<string, unknown> = {};
+      if (minPrice !== undefined) priceFilter.gte = minPrice;
+      if (maxPrice !== undefined) priceFilter.lte = maxPrice;
+      where.ticketTypes = { some: { price: priceFilter } };
     }
+
+    // Recommendations are only injected into the public listing: the
+    // recommender already excludes events the viewer organises, so there is
+    // nothing to gain (and retraining to spend) on an organiser/admin's own
+    // management listing.
+    const recommendedIds = canManageListing ? [] : (await getRecommendations(viewer?.id)).map((event) => event.id);
+    const recommendedIdSet = new Set(recommendedIds);
+    const tagRecommended = <T extends { id: string }>(event: T) => ({ ...event, isRecommended: recommendedIdSet.has(event.id) });
 
     const page = Math.max(1, Math.trunc(numberValue(req.query['page']) ?? 1));
     const limit = Math.min(100, Math.max(1, Math.trunc(numberValue(req.query['limit']) ?? 9)));
@@ -147,15 +174,30 @@ export const getEvents = async (req: Request, res: Response, next: NextFunction)
         return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       };
       allEvents.sort((a, b) => distance(a.latitude, a.longitude) - distance(b.latitude, b.longitude));
-      res.json({ events: allEvents.slice(skip, skip + limit), total: allEvents.length, page, limit, totalPages: Math.ceil(allEvents.length / limit) });
+      const ordered = withRecommendedFirst(allEvents, recommendedIds);
+      res.json({
+        events: ordered.slice(skip, skip + limit).map(tagRecommended),
+        total: allEvents.length, page, limit, totalPages: Math.ceil(allEvents.length / limit),
+      });
       return;
     }
 
-    const [events, total] = await Promise.all([
-      prisma.event.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take: limit, include: eventInclude }),
-      prisma.event.count({ where }),
-    ]);
-    res.json({ events, total, page, limit, totalPages: Math.ceil(total / limit) });
+    let events: Prisma.EventGetPayload<{ include: typeof eventInclude }>[];
+    let total: number;
+    if (recommendedIds.length > 0) {
+      const [allMatching, totalCount] = await Promise.all([
+        prisma.event.findMany({ where, orderBy: { createdAt: 'desc' }, include: eventInclude }),
+        prisma.event.count({ where }),
+      ]);
+      events = withRecommendedFirst(allMatching, recommendedIds).slice(skip, skip + limit);
+      total = totalCount;
+    } else {
+      [events, total] = await Promise.all([
+        prisma.event.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take: limit, include: eventInclude }),
+        prisma.event.count({ where }),
+      ]);
+    }
+    res.json({ events: events.map(tagRecommended), total, page, limit, totalPages: Math.ceil(total / limit) });
   } catch (error) {
     next(error);
   }
@@ -307,7 +349,7 @@ export const updateEvent = async (req: Request, res: Response, next: NextFunctio
         }
       }
 
-      const data: any = { capacity: updatedCapacity, startDateTime, endDateTime };
+      const data: Prisma.EventUpdateInput = { capacity: updatedCapacity, startDateTime, endDateTime };
       for (const field of ['title', 'eventType', 'venue', 'address', 'city', 'country', 'description'] as const) {
         if (body[field] !== undefined) {
           const value = stringValue(body[field]);

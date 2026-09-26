@@ -1,6 +1,12 @@
 *.env
 /backend/env
 /frontend/env
+
+# TLS certificates (generate locally with scripts/generate-certs.sh)
+/certs/*.key
+/certs/*.crt
+/certs/*.pem
+!/certs/.gitkeep
 /backend/uploads/*
 !/backend/uploads/.gitkeep
 !/backend/uploads/avatars/

@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import path from 'node:path';
+import fs from 'node:fs';
+import https from 'node:https';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -39,8 +41,18 @@ app.use('/categories', categoryRouter);
 
 app.use(errorHandler);
 
-app.listen(env.PORT, () => {
-  logger.info({ port: env.PORT, env: env.NODE_ENV }, 'Server started');
-});
+if (env.SSL_KEY_PATH && env.SSL_CERT_PATH) {
+  const httpsOptions = {
+    key:  fs.readFileSync(env.SSL_KEY_PATH),
+    cert: fs.readFileSync(env.SSL_CERT_PATH),
+  };
+  https.createServer(httpsOptions, app).listen(env.PORT, () => {
+    logger.info({ port: env.PORT, env: env.NODE_ENV, tls: true }, 'HTTPS server started');
+  });
+} else {
+  app.listen(env.PORT, () => {
+    logger.info({ port: env.PORT, env: env.NODE_ENV, tls: false }, 'HTTP server started');
+  });
+}
 
 export default app;

@@ -21,7 +21,10 @@ export default function EventCard({ event, onViewDetails }: EventCardProps) {
     <div className="modern-event-card">
       <div className="event-card-image-wrapper">
         {imageUrl ? <img src={imageUrl} alt={event.title} className="event-card-image" /> : <div className="event-card-image event-card-image--empty" aria-label="Δεν υπάρχει φωτογραφία" />}
-        <span className="event-card-tag tag-red">{statusLabels[event.status]}</span>
+        <div className="event-card-badges">
+          {event.isRecommended && <span className="event-card-tag tag-recommended">ΠΡΟΤΕΙΝΟΜΕΝΗ</span>}
+          <span className="event-card-tag tag-red">{statusLabels[event.status]}</span>
+        </div>
         <span className="event-card-type">{eventTypeLabel(event.eventType)}</span>
       </div>
       

@@ -2,7 +2,6 @@ import type { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import * as authService from '../services/auth.service.js';
 import { sendError } from '../utils/response.util.js';
-import { env } from '../config/env.js';
 import type { AuthenticatedRequest } from '../types/auth.types.js';
 
 
@@ -40,7 +39,7 @@ const REFRESH_COOKIE = 'refreshToken';
 function setRefreshCookie(res: Response, token: string): void {
   res.cookie(REFRESH_COOKIE, token, {
     httpOnly: true,
-    secure: env.NODE_ENV === 'production',
+    secure: true, // all traffic is HTTPS now (dev + prod)
     sameSite: 'strict',
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days in ms
     path: '/auth',

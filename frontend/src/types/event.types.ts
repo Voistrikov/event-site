@@ -52,6 +52,7 @@ export interface Event {
   updatedAt?: string;
   totalBooked?: number;
   _count?: { bookings: number };
+  isRecommended?: boolean;
 }
 
 export interface EventFormData {

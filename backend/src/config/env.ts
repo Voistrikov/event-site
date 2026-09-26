@@ -5,7 +5,9 @@ const envSchema = z.object({
   JWT_SECRET:   z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
   PORT:         z.coerce.number().int().positive().default(3000),
   NODE_ENV:     z.enum(['development', 'production', 'test']).default('development'),
-  FRONTEND_URL: z.string().url().default('http://localhost:5173'),
+  FRONTEND_URL: z.string().url().default('https://localhost:5173'),
+  SSL_KEY_PATH:  z.string().optional(),
+  SSL_CERT_PATH: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

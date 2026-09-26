@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { prisma } from '../config/prisma.js';
 import type { AuthenticatedRequest } from '../types/auth.types.js';
-import { sendError } from '../utils/response.util.js';
+import { AppError } from '../utils/appError.js';
 
 function userId(req: Request): string {
   return (req as AuthenticatedRequest).user.id;
@@ -14,8 +14,7 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
     const recipientKey = String(recipientId || recipientUsername || username || '').trim();
 
     if (!recipientKey || !subject || !body) {
-      res.status(400).json({ error: 'Missing required fields' });
-      return;
+      throw new AppError(400, 'VALIDATION_ERROR', 'Missing required fields');
     }
 
     const cleanUsername = recipientKey.startsWith('@') ? recipientKey.slice(1).trim() : recipientKey;
@@ -33,8 +32,7 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
     });
 
     if (!recipient) {
-      res.status(404).json({ error: 'Ο παραλήπτης δεν βρέθηκε (Recipient not found).' });
-      return;
+      throw new AppError(404, 'RECIPIENT_NOT_FOUND', 'Ο παραλήπτης δεν βρέθηκε (Recipient not found).');
     }
 
     const message = await prisma.message.create({
@@ -102,8 +100,7 @@ export const markAsRead = async (req: Request, res: Response, next: NextFunction
       data: { read: true },
     });
     if (result.count === 0) {
-      sendError(res, 404, 'Message not found.', 'MESSAGE_NOT_FOUND');
-      return;
+      throw new AppError(404, 'MESSAGE_NOT_FOUND', 'Message not found.');
     }
     res.status(204).send();
   } catch (error) {
@@ -118,8 +115,7 @@ export const deleteInboxMessage = async (req: Request, res: Response, next: Next
       data: { deletedByRecipient: true },
     });
     if (result.count === 0) {
-      sendError(res, 404, 'Message not found.', 'MESSAGE_NOT_FOUND');
-      return;
+      throw new AppError(404, 'MESSAGE_NOT_FOUND', 'Message not found.');
     }
     res.status(204).send();
   } catch (error) {
@@ -134,8 +130,7 @@ export const deleteSentMessage = async (req: Request, res: Response, next: NextF
       data: { deletedBySender: true },
     });
     if (result.count === 0) {
-      sendError(res, 404, 'Message not found.', 'MESSAGE_NOT_FOUND');
-      return;
+      throw new AppError(404, 'MESSAGE_NOT_FOUND', 'Message not found.');
     }
     res.status(204).send();
   } catch (error) {

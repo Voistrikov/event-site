@@ -5,7 +5,7 @@ import MessageSent from '../components/messaging/MessageSent';
 import ComposeMessage from '../components/messaging/ComposeMessage';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import '../styles/MessagingPage.css';
-import { deleteInboxMessage, deleteSentMessage, markMessageAsRead } from '../api/messagingApi';
+import { deleteInboxMessage, deleteSentMessage, markMessageAsRead } from '../api/messagesApi';
 
 export default function MessagingPage() {
   const [tab, setTab] = useState<'inbox' | 'sent' | 'compose'>('inbox');

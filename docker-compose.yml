@@ -32,15 +32,18 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: development
       PORT: 3000
-      FRONTEND_URL: http://localhost:5173
+      FRONTEND_URL: https://localhost:5173
+      SSL_KEY_PATH: /app/certs/server.key
+      SSL_CERT_PATH: /app/certs/server.crt
     volumes:
       - ./backend:/app
       - /app/node_modules
       - ./backend/uploads:/app/uploads
+      - ./certs:/app/certs:ro
     ports:
       - "3000:3000"
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      test: ["CMD", "node", "-e", "process.env.NODE_TLS_REJECT_UNAUTHORIZED='0'; fetch('https://localhost:3000/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -58,10 +61,15 @@ services:
       backend:
         condition: service_healthy
     environment:
-      VITE_API_URL: http://localhost:3000
+      # No VITE_API_URL: the browser calls the same origin (5173) and Vite
+      # proxies to BACKEND_ORIGIN server-side, so only one cert to trust.
+      BACKEND_ORIGIN: https://backend:3000
+      SSL_KEY_PATH: /app/certs/server.key
+      SSL_CERT_PATH: /app/certs/server.crt
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      - ./certs:/app/certs:ro
     ports:
       - "5173:5173"
 

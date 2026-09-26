@@ -4,6 +4,11 @@ import * as adminService from '../services/admin.service.js';
 import { sendError, sendPaginated } from '../utils/response.util.js';
 import type { AuthenticatedRequest } from '../types/auth.types.js';
 
+/** Escape special characters for XML attribute values */
+function xmlAttr(value: string | number): string {
+  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+}
+
 const listUsersQuerySchema = z.object({
   role:   z.enum(['ATTENDEE', 'ORGANIZER', 'ADMIN']).optional(),
   status: z.enum(['PENDING', 'APPROVED', 'REJECTED']).optional(),
@@ -99,17 +104,18 @@ export async function exportEventsXmlHandler(
     xml += '<Events>\n';
     
     for (const e of events) {
-      xml += `  <Event EventID="${e.id}">\n`;
+      xml += `  <Event EventID="${xmlAttr(e.id)}">\n`;
       xml += `    <Title><![CDATA[${e.title}]]></Title>\n`;
-      // We don't have categories dynamically mapped right now, we use a single eventType, but let's map it to category for DTD compliance
-      xml += `    <Category><![CDATA[${e.eventType}]]></Category>\n`;
+      for (const ec of e.categories) {
+        xml += `    <Category><![CDATA[${ec.category.name}]]></Category>\n`;
+      }
       xml += `    <EventType><![CDATA[${e.eventType}]]></EventType>\n`;
       xml += `    <Venue><![CDATA[${e.venue}]]></Venue>\n`;
       xml += `    <Address><![CDATA[${e.address}]]></Address>\n`;
       xml += `    <City><![CDATA[${e.city}]]></City>\n`;
       xml += `    <Country><![CDATA[${e.country}]]></Country>\n`;
       if (e.latitude && e.longitude) {
-        xml += `    <GeoLocation Latitude="${e.latitude}" Longitude="${e.longitude}"/>\n`;
+        xml += `    <GeoLocation Latitude="${xmlAttr(e.latitude)}" Longitude="${xmlAttr(e.longitude)}"/>\n`;
       }
       xml += `    <StartDateTime>${e.startDateTime.toISOString()}</StartDateTime>\n`;
       xml += `    <EndDateTime>${e.endDateTime.toISOString()}</EndDateTime>\n`;
@@ -117,7 +123,7 @@ export async function exportEventsXmlHandler(
       
       xml += `    <TicketTypes>\n`;
       for (const t of e.ticketTypes) {
-        xml += `      <TicketType TicketTypeID="${t.id}">\n`;
+        xml += `      <TicketType TicketTypeID="${xmlAttr(t.id)}">\n`;
         xml += `        <Name><![CDATA[${t.name}]]></Name>\n`;
         xml += `        <Price>${t.price}</Price>\n`;
         xml += `        <Quantity>${t.quantity}</Quantity>\n`;
@@ -128,8 +134,8 @@ export async function exportEventsXmlHandler(
       
       xml += `    <Bookings>\n`;
       for (const b of e.bookings) {
-        xml += `      <Booking BookingID="${b.id}">\n`;
-        xml += `        <Attendee UserID="${b.user.username}"/>\n`;
+        xml += `      <Booking BookingID="${xmlAttr(b.id)}">\n`;
+        xml += `        <Attendee UserID="${xmlAttr(b.user.username)}"/>\n`;
         xml += `        <Time>${b.createdAt.toISOString()}</Time>\n`;
         xml += `        <TicketTypeRef>${b.ticketTypeId}</TicketTypeRef>\n`;
         xml += `        <NumberOfTickets>${b.numberOfTickets}</NumberOfTickets>\n`;
@@ -139,7 +145,7 @@ export async function exportEventsXmlHandler(
       }
       xml += `    </Bookings>\n`;
       
-      xml += `    <Organizer UserID="${e.organizer.username}"/>\n`;
+      xml += `    <Organizer UserID="${xmlAttr(e.organizer.username)}"/>\n`;
       xml += `    <Status>${e.status}</Status>\n`;
       xml += `    <Description><![CDATA[${e.description}]]></Description>\n`;
       

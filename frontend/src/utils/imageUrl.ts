@@ -1,4 +1,5 @@
-const API_URL = import.meta.env['VITE_API_URL'] ?? 'http://localhost:3000';
+// Same-origin by default -- see axiosInstance.ts for why.
+const API_URL = import.meta.env['VITE_API_URL'] ?? '';
 
 /** Resolves stored upload paths and legacy bare event filenames. */
 export function fileUrl(value?: string | null): string | null {

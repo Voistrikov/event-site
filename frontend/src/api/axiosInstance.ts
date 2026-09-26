@@ -1,7 +1,11 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '../store/authStore';
 
-const BASE_URL = import.meta.env['VITE_API_URL'] ?? 'http://localhost:3000';
+// Empty by default: requests go to the current origin and are proxied
+// server-side to the backend (see vite.config.ts), so the browser only ever
+// has to trust one HTTPS certificate. Set VITE_API_URL to call a backend on
+// a different, browser-trusted origin instead (e.g. a real deployment).
+const BASE_URL = import.meta.env['VITE_API_URL'] ?? '';
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,

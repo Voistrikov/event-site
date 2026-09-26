@@ -2,7 +2,6 @@ import type { NextFunction, Request, Response } from 'express';
 import { prisma } from '../config/prisma.js';
 import type { AuthenticatedRequest } from '../types/auth.types.js';
 import { AppError } from '../utils/appError.js';
-import { sendError } from '../utils/response.util.js';
 
 function currentUser(req: Request) {
   return (req as AuthenticatedRequest).user;
@@ -22,8 +21,7 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
       || !Number.isInteger(numberOfTickets)
       || (numberOfTickets as number) < 1
     ) {
-      sendError(res, 400, 'eventId, ticketTypeId and a positive integer numberOfTickets are required.', 'VALIDATION_ERROR');
-      return;
+      throw new AppError(400, 'VALIDATION_ERROR', 'eventId, ticketTypeId and a positive integer numberOfTickets are required.');
     }
 
     const userId = currentUser(req).id;

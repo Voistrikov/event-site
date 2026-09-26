@@ -1,6 +1,25 @@
 import { prisma } from '../config/prisma.js';
 import type { Role, UserStatus, UserResponseDto } from '../types/auth.types.js';
 
+const userResponseSelect = {
+  id: true,
+  username: true,
+  firstName: true,
+  lastName: true,
+  email: true,
+  phone: true,
+  address: true,
+  city: true,
+  country: true,
+  latitude: true,
+  longitude: true,
+  taxId: true,
+  role: true,
+  status: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
 export interface ListUsersQuery {
   role?: Role | undefined;
   status?: UserStatus | undefined;
@@ -22,24 +41,7 @@ export async function listUsers(query: ListUsersQuery): Promise<ListUsersResult>
   const [users, total] = await prisma.$transaction([
     prisma.user.findMany({
       where,
-      select: {
-        id: true,
-        username: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        phone: true,
-        address: true,
-        city: true,
-        country: true,
-        latitude: true,
-        longitude: true,
-        taxId: true,
-        role: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: userResponseSelect,
       orderBy: { createdAt: 'desc' },
       skip: (query.page - 1) * query.limit,
       take: query.limit,
@@ -57,24 +59,7 @@ export async function updateUserStatus(
   const user = await prisma.user.update({
     where: { id: userId },
     data: { status },
-    select: {
-      id: true,
-      username: true,
-      firstName: true,
-      lastName: true,
-      email: true,
-      phone: true,
-      address: true,
-      city: true,
-      country: true,
-      latitude: true,
-      longitude: true,
-      taxId: true,
-      role: true,
-      status: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+    select: userResponseSelect,
   });
 
   return user as UserResponseDto;
@@ -103,24 +88,7 @@ export async function getAllEventsForExport() {
 export async function getUserById(userId: string): Promise<UserResponseDto> {
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: userId },
-    select: {
-      id: true,
-      username: true,
-      firstName: true,
-      lastName: true,
-      email: true,
-      phone: true,
-      address: true,
-      city: true,
-      country: true,
-      latitude: true,
-      longitude: true,
-      taxId: true,
-      role: true,
-      status: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+    select: userResponseSelect,
   });
   return user as UserResponseDto;
 }

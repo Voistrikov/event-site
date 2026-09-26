@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getInbox, getSent } from '../api/messagingApi';
+import { getInbox, getSent } from '../api/messagesApi';
 import type { Message } from '../types/message.types';
 
 export function useMessages() {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { sendMessage } from '../../api/messagingApi';
+import { sendMessage } from '../../api/messagesApi';
 
 interface ComposeMessageProps {
   onSent?: () => void;
