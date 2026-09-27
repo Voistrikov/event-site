@@ -101,6 +101,46 @@ export async function exportEventsXmlHandler(
     const events = await adminService.getAllEventsForExport();
     
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    xml += '<!DOCTYPE Events [\n';
+    xml += '  <!ELEMENT Events (Event*)>\n';
+    xml += '  <!ELEMENT Event (Title, Category+, EventType, Venue, Address, City, Country, GeoLocation?, StartDateTime, EndDateTime, Capacity, TicketTypes, Bookings, Organizer, Status, Description, Media?)>\n';
+    xml += '  <!ATTLIST Event EventID CDATA #REQUIRED>\n';
+    xml += '  <!ELEMENT Title (#PCDATA)>\n';
+    xml += '  <!ELEMENT Category (#PCDATA)>\n';
+    xml += '  <!ELEMENT EventType (#PCDATA)>\n';
+    xml += '  <!ELEMENT Venue (#PCDATA)>\n';
+    xml += '  <!ELEMENT Address (#PCDATA)>\n';
+    xml += '  <!ELEMENT City (#PCDATA)>\n';
+    xml += '  <!ELEMENT Country (#PCDATA)>\n';
+    xml += '  <!ELEMENT GeoLocation EMPTY>\n';
+    xml += '  <!ATTLIST GeoLocation Latitude CDATA #REQUIRED Longitude CDATA #REQUIRED>\n';
+    xml += '  <!ELEMENT StartDateTime (#PCDATA)>\n';
+    xml += '  <!ELEMENT EndDateTime (#PCDATA)>\n';
+    xml += '  <!ELEMENT Capacity (#PCDATA)>\n';
+    xml += '  <!ELEMENT TicketTypes (TicketType+)>\n';
+    xml += '  <!ELEMENT TicketType (Name, Price, Quantity, Available)>\n';
+    xml += '  <!ATTLIST TicketType TicketTypeID CDATA #REQUIRED>\n';
+    xml += '  <!ELEMENT Name (#PCDATA)>\n';
+    xml += '  <!ELEMENT Price (#PCDATA)>\n';
+    xml += '  <!ELEMENT Quantity (#PCDATA)>\n';
+    xml += '  <!ELEMENT Available (#PCDATA)>\n';
+    xml += '  <!ELEMENT Bookings (Booking*)>\n';
+    xml += '  <!ELEMENT Booking (Attendee, Time, TicketTypeRef, NumberOfTickets, TotalCost, BookingStatus)>\n';
+    xml += '  <!ATTLIST Booking BookingID CDATA #REQUIRED>\n';
+    xml += '  <!ELEMENT Attendee EMPTY>\n';
+    xml += '  <!ATTLIST Attendee UserID CDATA #REQUIRED>\n';
+    xml += '  <!ELEMENT Time (#PCDATA)>\n';
+    xml += '  <!ELEMENT TicketTypeRef (#PCDATA)>\n';
+    xml += '  <!ELEMENT NumberOfTickets (#PCDATA)>\n';
+    xml += '  <!ELEMENT TotalCost (#PCDATA)>\n';
+    xml += '  <!ELEMENT BookingStatus (#PCDATA)>\n';
+    xml += '  <!ELEMENT Organizer EMPTY>\n';
+    xml += '  <!ATTLIST Organizer UserID CDATA #REQUIRED>\n';
+    xml += '  <!ELEMENT Status (#PCDATA)>\n';
+    xml += '  <!ELEMENT Description (#PCDATA)>\n';
+    xml += '  <!ELEMENT Media (Photo*)>\n';
+    xml += '  <!ELEMENT Photo (#PCDATA)>\n';
+    xml += ']>\n';
     xml += '<Events>\n';
     
     for (const e of events) {
